@@ -107,7 +107,7 @@ export default function AdminIsland() {
           </button>
         </div>
         {!authed && <p className="mt-2 text-xs text-slate-500">Token wajib untuk memuat dashboard.</p>}
-      </div>
+      </form>
 
       {authed && (
         <>
@@ -115,31 +115,31 @@ export default function AdminIsland() {
             <div className="grid gap-3 md:grid-cols-2">
               <Input label="Slug" value={form.slug} onChange={(v) => setForm({ ...form, slug: v })} required />
               <Input label="Judul" value={form.title} onChange={(v) => setForm({ ...form, title: v })} required />
-          <Input label="Artist" value={form.artist ?? ''} onChange={(v) => setForm({ ...form, artist: v })} />
-          <Input
-            label="Bahasa"
-            value={form.language ?? 'id'}
-            onChange={(v) => setForm({ ...form, language: v })}
-            required
-          />
-        </div>
-        <label className="text-sm text-slate-300">Lirik</label>
-        <textarea
-          className="w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-slate-50"
-          rows={8}
-          value={form.body}
-          onChange={(e) => setForm({ ...form, body: e.target.value })}
-          required
-        />
-        <button
-          type="submit"
-          className="rounded bg-cyan-500 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-cyan-400"
-        >
-          Simpan
-        </button>
-            </form>
+              <Input label="Artist" value={form.artist ?? ''} onChange={(v) => setForm({ ...form, artist: v })} />
+              <Input
+                label="Bahasa"
+                value={form.language ?? 'id'}
+                onChange={(v) => setForm({ ...form, language: v })}
+                required
+              />
+            </div>
+            <label className="text-sm text-slate-300">Lirik</label>
+            <textarea
+              className="w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-slate-50"
+              rows={8}
+              value={form.body}
+              onChange={(e) => setForm({ ...form, body: e.target.value })}
+              required
+            />
+            <button
+              type="submit"
+              className="rounded bg-cyan-500 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-cyan-400"
+            >
+              Simpan
+            </button>
+          </form>
 
-      {message && <p className="text-sm text-cyan-200">{message}</p>}
+          {message && <p className="text-sm text-cyan-200">{message}</p>}
 
           <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
             <div className="flex items-center justify-between">
