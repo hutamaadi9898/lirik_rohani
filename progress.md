@@ -13,3 +13,7 @@
 - Exempted `/api/admin/session` from middleware auth so session verification happens only in the handler (covers environments that strip Authorization before middleware).
 2025-11-21
 - Hardened `/api/admin/songs` POST with JSON validation, missing-binding guard, and D1 error handling to return clean JSON instead of 500s; added DB guard to GET/DELETE.
+2025-11-21
+- Added detailed DB error mapping (surface "Database not migrated" and include detail) for admin songs CRUD to pinpoint remaining server errors.
+2025-11-21
+- Fixed song detail rendering to handle non-string bodies without showing “[object Object]”; search now auto-runs as you type (debounced) and guards snippet rendering.

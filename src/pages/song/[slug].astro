@@ -30,6 +30,16 @@ if (!song) {
   return Astro.redirect('/404');
 }
 
+const normalizeBody = (raw: unknown) => {
+  if (typeof raw === 'string') return raw;
+  try {
+    return JSON.stringify(raw, null, 2);
+  } catch {
+    return String(raw ?? '');
+  }
+};
+
+const bodyText = normalizeBody(song.body);
 const pageTitle = `${song.title} — Lirik Rohani`;
 const description = song.artist
   ? `Lirik "${song.title}" oleh ${song.artist}`
@@ -55,7 +65,7 @@ const jsonLd = {
       {song.artist && <p class="text-sm text-slate-400">oleh {song.artist}</p>}
     </header>
     <div class="prose prose-invert max-w-none leading-relaxed text-slate-100">
-      {song.body.split('\n').map((line) => (
+      {bodyText.split(/\r?\n/).map((line) => (
         <p>{line || '\u00a0'}</p>
       ))}
     </div>

@@ -26,6 +26,8 @@ export function SearchIsland({ initialQuery = '' }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const hasQuery = query.trim().length > 0;
+  const debounceMs = 250;
+  const [lastFetched, setLastFetched] = useState('');
 
   const fetchResults = useCallback(
     async (q: string) => {
@@ -33,6 +35,7 @@ export function SearchIsland({ initialQuery = '' }: Props) {
         setResults([]);
         return;
       }
+      setLastFetched(q);
       setLoading(true);
       setError(null);
       try {
@@ -54,6 +57,18 @@ export function SearchIsland({ initialQuery = '' }: Props) {
       fetchResults(initialQuery);
     }
   }, [initialQuery, fetchResults]);
+
+  // Live search as user types (debounced).
+  useEffect(() => {
+    if (!query.trim()) {
+      setResults([]);
+      return;
+    }
+    const handle = setTimeout(() => {
+      if (query !== lastFetched) fetchResults(query);
+    }, debounceMs);
+    return () => clearTimeout(handle);
+  }, [query, fetchResults, lastFetched]);
 
   const handleSubmit = useCallback(
     (evt: FormEvent) => {
@@ -143,7 +158,7 @@ export function SearchIsland({ initialQuery = '' }: Props) {
                 Lihat
               </span>
             </div>
-            {item.snippet && (
+            {typeof item.snippet === 'string' && item.snippet.trim().length > 0 && (
               <p
                 className="mt-3 text-sm text-slate-300"
                 dangerouslySetInnerHTML={{ __html: item.snippet }}

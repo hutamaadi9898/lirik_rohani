@@ -23,6 +23,16 @@ const log = async (env: Env, action: string, payload: unknown) => {
   await env.AUDIT_LOG.put(`audit:${ts}:${crypto.randomUUID()}`, JSON.stringify({ action, payload, ts }));
 };
 
+const unwrapError = (err: unknown) => (err instanceof Error ? err.message : String(err));
+
+const mapDbError = (err: unknown) => {
+  const msg = unwrapError(err);
+  if (msg.includes('no such table') || msg.includes('no such column')) {
+    return 'Database not migrated';
+  }
+  return 'Server error';
+};
+
 const slugify = (value: string) =>
   value
     .toLowerCase()
@@ -52,10 +62,14 @@ export const GET: APIRoute = async ({ locals, request }) => {
   const env = (locals.runtime?.env ?? {}) as Env;
   if (!checkAuth(request, env, locals)) return respond({ ok: false, error: 'Unauthorized' }, 401);
   if (!env.LYRICS_DB) return respond({ ok: false, error: 'Database not bound' }, 500);
-  const { results } = await env.LYRICS_DB.prepare(
-    'SELECT id, slug, title, artist, language FROM songs ORDER BY updated_at DESC LIMIT 200;',
-  ).all();
-  return respond({ ok: true, data: results ?? [] });
+  try {
+    const { results } = await env.LYRICS_DB.prepare(
+      'SELECT id, slug, title, artist, language FROM songs ORDER BY updated_at DESC LIMIT 200;',
+    ).all();
+    return respond({ ok: true, data: results ?? [] });
+  } catch (err) {
+    return respond({ ok: false, error: mapDbError(err), detail: unwrapError(err) }, 500);
+  }
 };
 
 export const POST: APIRoute = async ({ locals, request }) => {
@@ -90,8 +104,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
       .bind(finalSlug, title, artist, language, lyrics)
       .run();
   } catch (err) {
-    console.error('D1 insert error', err);
-    return respond({ ok: false, error: 'Server error' }, 500);
+    return respond({ ok: false, error: mapDbError(err), detail: unwrapError(err) }, 500);
   }
 
   await env.LYRICS_CACHE?.delete(`search:${finalSlug}`);
@@ -105,7 +118,11 @@ export const DELETE: APIRoute = async ({ locals, url, request }) => {
   if (!env.LYRICS_DB) return respond({ ok: false, error: 'Database not bound' }, 500);
   const slug = url.searchParams.get('slug');
   if (!slug) return respond({ ok: false, error: 'Missing slug' }, 400);
-  await env.LYRICS_DB.prepare('DELETE FROM songs WHERE slug = ?;').bind(slug).run();
+  try {
+    await env.LYRICS_DB.prepare('DELETE FROM songs WHERE slug = ?;').bind(slug).run();
+  } catch (err) {
+    return respond({ ok: false, error: mapDbError(err), detail: unwrapError(err) }, 500);
+  }
   await env.LYRICS_CACHE?.delete(`search:${slug}`);
   await log(env, 'delete', { slug });
   return respond({ ok: true, data: null });
