@@ -6,6 +6,7 @@ const AUTH_EXEMPT_PATHS = ['/api/admin/session'];
 
 export const onRequest: MiddlewareHandler = async (context, next) => {
   const url = new URL(context.request.url);
+  const debugVersion = 'song-debug-2025-11-21-4';
 
   const applySecurityHeaders = (response: Response) => {
     response.headers.set('X-Content-Type-Options', 'nosniff');
@@ -13,6 +14,7 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
     response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
     response.headers.set('Cross-Origin-Resource-Policy', 'same-origin');
+    response.headers.set('X-Debug-Version', debugVersion);
     if (import.meta.env.PROD) {
       response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
     }

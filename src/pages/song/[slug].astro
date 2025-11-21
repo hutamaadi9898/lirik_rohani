@@ -6,6 +6,9 @@ export const prerender = false;
 const slug = Astro.params.slug!;
 const runtime = Astro.locals.runtime;
 const env = runtime?.env as Env | undefined;
+const debugVersion = 'song-debug-2025-11-21-4';
+Astro.response.headers.set('X-Debug-Version', debugVersion);
+Astro.response.headers.set('X-Debug-Slug', slug);
 
 type SongRow = {
   id: string;
@@ -132,6 +135,16 @@ const description = artistText
   ? `Lirik "${titleText}" oleh ${artistText}`
   : `Lirik "${titleText}"`;
 
+const debugInfo = {
+  debugVersion,
+  slug,
+  hasDbBinding: Boolean(env?.LYRICS_DB),
+  loadError,
+  hasSong: Boolean(song),
+  bodyLength: bodyText.length,
+  languageType: typeof song?.language,
+};
+
 ---
 
 <BaseLayout title={pageTitle} description={description}>
@@ -152,6 +165,11 @@ const description = artistText
         : !loadError && <p class="italic text-slate-400">Lirik belum tersedia.</p>}
     </div>
   </article>
+
+  <details class="mt-6 rounded-xl border border-dashed border-slate-700 bg-slate-900/50 p-3 text-xs text-slate-400">
+    <summary class="cursor-pointer text-slate-300">Debug info</summary>
+    <pre class="mt-2 whitespace-pre-wrap break-all">{JSON.stringify(debugInfo, null, 2)}</pre>
+  </details>
 
   <script type="application/ld+json">
     {JSON.stringify({
