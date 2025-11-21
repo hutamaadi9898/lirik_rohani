@@ -26,3 +26,4 @@
 2025-11-21
 - Added broader body coercion (arrays, nested, JSON strings, [object Object]) to fully suppress bad rendering on song pages.
 2025-11-21 - Hardened song detail rendering (recursive string extraction + artist sanitization) to eliminate residual "[object Object]" cases including the "lihat" lyrics.
+2025-11-21 - Fixed undefined jsonLd causing slug pages to crash and return "[object Object]"; inlined JSON-LD generation to guarantee render safety.

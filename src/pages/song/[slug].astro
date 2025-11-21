@@ -118,16 +118,6 @@ const description = artistText
   ? `Lirik "${titleText}" oleh ${artistText}`
   : `Lirik "${titleText}"`;
 
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'MusicRecording',
-  name: titleText,
-  inLanguage: languageText,
-  byArtist: artistText ? { '@type': 'MusicGroup', name: artistText } : undefined,
-  url: `${Astro.url.origin}/song/${song.slug}`,
-  datePublished: new Date((song.created_at ?? 0) * 1000).toISOString(),
-  dateModified: new Date((song.updated_at ?? song.created_at ?? 0) * 1000).toISOString(),
-};
 ---
 
 <BaseLayout title={pageTitle} description={description}>
@@ -145,6 +135,15 @@ const jsonLd = {
   </article>
 
   <script type="application/ld+json">
-    {JSON.stringify(jsonLd)}
+    {JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'MusicRecording',
+      name: titleText,
+      inLanguage: languageText,
+      byArtist: artistText ? { '@type': 'MusicGroup', name: artistText } : undefined,
+      url: `${Astro.url.origin}/song/${song.slug}`,
+      datePublished: new Date((song.created_at ?? 0) * 1000).toISOString(),
+      dateModified: new Date((song.updated_at ?? song.created_at ?? 0) * 1000).toISOString(),
+    })}
   </script>
 </BaseLayout>
