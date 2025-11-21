@@ -29,3 +29,4 @@
 2025-11-21 - Fixed undefined jsonLd causing slug pages to crash and return "[object Object]"; inlined JSON-LD generation to guarantee render safety.
 2025-11-21 - Added try/catch + user-friendly error panel on song pages so any DB/render failure falls back to readable HTML instead of "[object Object]".
 2025-11-21 - Added global middleware error catch to surface errors as plain text with headers, log slug load errors, and flag missing LYRICS_DB binding for debugging lingering "[object Object]" responses.
+2025-11-21 - Added `/api/debug-song` to inspect a slug's row/binding status remotely for diagnosing Pages issues.

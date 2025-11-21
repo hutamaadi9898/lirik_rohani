@@ -6,7 +6,7 @@ const AUTH_EXEMPT_PATHS = ['/api/admin/session'];
 
 export const onRequest: MiddlewareHandler = async (context, next) => {
   const url = new URL(context.request.url);
-  const debugVersion = 'song-debug-2025-11-21-4';
+  const debugVersion = 'song-debug-2025-11-21-5';
 
   const applySecurityHeaders = (response: Response) => {
     response.headers.set('X-Content-Type-Options', 'nosniff');
