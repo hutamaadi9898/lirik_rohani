@@ -49,7 +49,7 @@ export const OPTIONS: APIRoute = ({ request }) => {
 };
 
 export const GET: APIRoute = async ({ locals, request }) => {
-  const env = locals.runtime?.env as Env;
+  const env = (locals.runtime?.env ?? {}) as Env;
   if (!checkAuth(request, env, locals)) return respond({ ok: false, error: 'Unauthorized' }, 401);
   const { results } = await env.LYRICS_DB.prepare(
     'SELECT id, slug, title, artist, language FROM songs ORDER BY updated_at DESC LIMIT 200;',
@@ -58,7 +58,7 @@ export const GET: APIRoute = async ({ locals, request }) => {
 };
 
 export const POST: APIRoute = async ({ locals, request }) => {
-  const env = locals.runtime?.env as Env;
+  const env = (locals.runtime?.env ?? {}) as Env;
   if (!checkAuth(request, env, locals)) return respond({ ok: false, error: 'Unauthorized' }, 401);
   const body = await request.json();
   const { slug, title, artist, language = 'id', body: lyrics } = body;
@@ -85,7 +85,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 };
 
 export const DELETE: APIRoute = async ({ locals, url, request }) => {
-  const env = locals.runtime?.env as Env;
+  const env = (locals.runtime?.env ?? {}) as Env;
   if (!checkAuth(request, env, locals)) return respond({ ok: false, error: 'Unauthorized' }, 401);
   const slug = url.searchParams.get('slug');
   if (!slug) return respond({ ok: false, error: 'Missing slug' }, 400);

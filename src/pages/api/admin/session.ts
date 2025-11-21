@@ -10,9 +10,9 @@ const respond = (obj: unknown, status = 200, extraHeaders: Record<string, string
   });
 
 export const POST: APIRoute = async ({ locals, request }) => {
-  const env = locals.runtime?.env as Env;
+  const env = (locals.runtime?.env ?? {}) as Env;
   const expected = env.ADMIN_TOKEN?.trim();
-  if (!expected) return respond({ ok: false, error: 'Unauthorized' }, 401);
+  if (!expected) return respond({ ok: false, error: 'Admin token not configured on server' }, 500);
 
   // Prefer Authorization header; fall back to JSON body token only if header missing.
   let provided = readBearer(request)?.trim();

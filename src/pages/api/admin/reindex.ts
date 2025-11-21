@@ -10,7 +10,7 @@ const respond = (obj: unknown, status = 200) =>
   });
 
 export const POST: APIRoute = async ({ locals, request }) => {
-  const env = locals.runtime?.env as Env;
+  const env = (locals.runtime?.env ?? {}) as Env;
   if (!isAdminAuthorized(request, env, locals)) {
     return respond({ ok: false, error: 'Unauthorized' }, 401);
   }
