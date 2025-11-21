@@ -70,7 +70,8 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   if (redirectMap[url.pathname]) {
     const target = redirectMap[url.pathname];
     const location = url.search ? `${target}${url.search}` : target;
-    return applySecurityHeaders(Response.redirect(location, 301));
+    const absolute = new URL(location, url.origin).toString();
+    return applySecurityHeaders(Response.redirect(absolute, 301));
   }
 
   // 410 for removed songs/slugs
@@ -89,7 +90,8 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     const normalized = slugPart.trim().toLowerCase().replace(/\s+/g, '-');
     if (normalized && normalized !== slugPart) {
       const target = `/song/${normalized}${url.search}`;
-      return applySecurityHeaders(Response.redirect(target, 301));
+      const absolute = new URL(target, url.origin).toString();
+      return applySecurityHeaders(Response.redirect(absolute, 301));
     }
   }
 
@@ -132,7 +134,8 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     }
     // Redirect any unknown routes to custom 404 page
     if (response.status === 404 && url.pathname !== '/404') {
-      return applySecurityHeaders(Response.redirect('/404', 302));
+      const notFound = new URL('/404', url.origin).toString();
+      return applySecurityHeaders(Response.redirect(notFound, 302));
     }
 
     // Inspect song page responses to catch unexpected bodies.
