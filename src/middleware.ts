@@ -1,36 +1,43 @@
 import type { MiddlewareHandler } from 'astro';
+import { readBearer } from './lib/adminAuth';
 
 const PROTECTED_PREFIXES = ['/api/admin'];
 
 export const onRequest: MiddlewareHandler = async (context, next) => {
   const url = new URL(context.request.url);
 
+  const applySecurityHeaders = (response: Response) => {
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+    response.headers.set('Referrer-Policy', 'same-origin');
+    response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
+    response.headers.set('Cross-Origin-Resource-Policy', 'same-origin');
+    if (import.meta.env.PROD) {
+      response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+    }
+    return response;
+  };
+
   const needsAuth = PROTECTED_PREFIXES.some((path) => url.pathname.startsWith(path));
 
   if (needsAuth) {
     const expected = context.locals.runtime?.env?.ADMIN_TOKEN;
-    const bearer = context.request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
-    const queryToken = url.searchParams.get('token');
-    const cookieToken = context.cookies.get('admin_token')?.value;
-    const token = bearer || queryToken || cookieToken;
-
-    const valid = expected && token === expected;
-
-    if (valid && queryToken) {
-      const redirectUrl = new URL(url.href);
-      redirectUrl.searchParams.delete('token');
-      const res = Response.redirect(redirectUrl.toString(), 302);
-      res.headers.append(
-        'Set-Cookie',
-        `admin_token=${queryToken}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${60 * 60 * 12}`,
-      );
-      return res;
+    if (!expected) {
+      return applySecurityHeaders(new Response('Server misconfigured', { status: 500 }));
     }
+    const bearer = readBearer(context.request);
+    const cookieToken = context.cookies.get('admin_token')?.value;
+    const token = bearer || cookieToken;
+
+    const valid = token === expected;
 
     if (!valid) {
-      return new Response('Unauthorized', { status: 401 });
+      return applySecurityHeaders(new Response('Unauthorized', { status: 401 }));
     }
+
+    context.locals.isAdmin = true;
   }
 
-  return next();
+  const response = await next();
+  return applySecurityHeaders(response);
 };

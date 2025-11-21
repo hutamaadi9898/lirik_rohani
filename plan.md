@@ -35,6 +35,7 @@ Goal: Ship a fast, mobile-first Astro 5.16 app for searching Indonesian worship 
 - [x] Auth: single-user token or signed link middleware
 - [x] Admin UI: list/create/update songs, FTS rebuild button
 - [x] Audit log to KV (append-only) for admin actions
+- [x] Harden admin token flow (no query tokens, HttpOnly session, security headers)
 - [ ] Better error boundaries + user-facing fallbacks
 - [ ] P99 latency SLO (<75ms warm) measured and logged
 

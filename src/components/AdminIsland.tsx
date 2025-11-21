@@ -29,7 +29,7 @@ export default function AdminIsland() {
 
   const load = async () => {
     setLoading(true);
-    const res = await fetch('/api/admin/songs', { headers });
+    const res = await fetch('/api/admin/songs', { headers, credentials: 'same-origin' });
     const json = (await res.json()) as ApiResponse<Song[]>;
     if (json.ok) setList(json.data);
     else setMessage(json.error);
@@ -43,20 +43,30 @@ export default function AdminIsland() {
       setMessage('Masukkan token');
       return;
     }
-    const res = await fetch(`/api/admin/songs?token=${encodeURIComponent(token)}`, { method: 'GET' });
-    if (res.ok) {
-      setAuthed(true);
-      await load();
-    } else {
+    const res = await fetch('/api/admin/session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(headers ?? {}),
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify({ token }),
+    });
+    if (!res.ok) {
       setAuthed(false);
       setMessage('Token salah atau tidak diisi');
+      return;
     }
+    setAuthed(true);
+    await load();
+    setToken('');
   };
 
   const remove = async (slug: string) => {
     const res = await fetch(`/api/admin/songs?slug=${encodeURIComponent(slug)}`, {
       method: 'DELETE',
       headers,
+      credentials: 'same-origin',
     });
     const json = (await res.json()) as ApiResponse<null>;
     setMessage(json.ok ? 'Dihapus' : json.error);
@@ -72,6 +82,7 @@ export default function AdminIsland() {
         'Content-Type': 'application/json',
         ...(headers ?? {}),
       },
+      credentials: 'same-origin',
       body: JSON.stringify(form),
     });
     const json = (await res.json()) as ApiResponse<Song>;
@@ -83,7 +94,7 @@ export default function AdminIsland() {
   };
 
   const rebuild = async () => {
-    const res = await fetch('/api/admin/reindex', { method: 'POST', headers });
+    const res = await fetch('/api/admin/reindex', { method: 'POST', headers, credentials: 'same-origin' });
     const json = (await res.json()) as ApiResponse<null>;
     setMessage(json.ok ? 'FTS di-rebuild' : json.error);
   };

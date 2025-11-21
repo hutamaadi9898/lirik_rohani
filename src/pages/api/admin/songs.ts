@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { isAdminAuthorized } from '@/lib/adminAuth';
 
 type Env = {
   LYRICS_DB: D1Database;
@@ -7,21 +8,19 @@ type Env = {
   ADMIN_TOKEN?: string;
 };
 
+const checkAuth = (request: Request, env: Env, locals: { isAdmin?: boolean }) =>
+  isAdminAuthorized(request, env, locals);
+
 const respond = (obj: unknown, status = 200) =>
-  new Response(JSON.stringify(obj), { status, headers: { 'Content-Type': 'application/json' } });
+  new Response(JSON.stringify(obj), {
+    status,
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+  });
 
 const log = async (env: Env, action: string, payload: unknown) => {
   if (!env.AUDIT_LOG) return;
   const ts = new Date().toISOString();
   await env.AUDIT_LOG.put(`audit:${ts}:${crypto.randomUUID()}`, JSON.stringify({ action, payload, ts }));
-};
-
-const checkAuth = (request: Request, env: Env) => {
-  const expected = env.ADMIN_TOKEN;
-  const bearer = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
-  const queryToken = new URL(request.url).searchParams.get('token');
-  const token = bearer || queryToken;
-  return Boolean(expected && token === expected);
 };
 
 const slugify = (value: string) =>
@@ -35,19 +34,23 @@ const slugify = (value: string) =>
 
 export const prerender = false;
 
-export const OPTIONS: APIRoute = () =>
-  new Response(null, {
+export const OPTIONS: APIRoute = ({ request }) => {
+  const origin = new URL(request.url).origin;
+  return new Response(null, {
     status: 204,
     headers: {
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': origin,
       'Access-Control-Allow-Methods': 'GET,POST,DELETE,OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+      'Access-Control-Allow-Credentials': 'true',
+      Vary: 'Origin',
     },
   });
+};
 
 export const GET: APIRoute = async ({ locals, request }) => {
   const env = locals.runtime?.env as Env;
-  if (!checkAuth(request, env)) return respond({ ok: false, error: 'Unauthorized' }, 401);
+  if (!checkAuth(request, env, locals)) return respond({ ok: false, error: 'Unauthorized' }, 401);
   const { results } = await env.LYRICS_DB.prepare(
     'SELECT id, slug, title, artist, language FROM songs ORDER BY updated_at DESC LIMIT 200;',
   ).all();
@@ -56,7 +59,7 @@ export const GET: APIRoute = async ({ locals, request }) => {
 
 export const POST: APIRoute = async ({ locals, request }) => {
   const env = locals.runtime?.env as Env;
-  if (!checkAuth(request, env)) return respond({ ok: false, error: 'Unauthorized' }, 401);
+  if (!checkAuth(request, env, locals)) return respond({ ok: false, error: 'Unauthorized' }, 401);
   const body = await request.json();
   const { slug, title, artist, language = 'id', body: lyrics } = body;
   if (!title || !lyrics) return respond({ ok: false, error: 'Missing fields' }, 400);
@@ -83,7 +86,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 export const DELETE: APIRoute = async ({ locals, url, request }) => {
   const env = locals.runtime?.env as Env;
-  if (!checkAuth(request, env)) return respond({ ok: false, error: 'Unauthorized' }, 401);
+  if (!checkAuth(request, env, locals)) return respond({ ok: false, error: 'Unauthorized' }, 401);
   const slug = url.searchParams.get('slug');
   if (!slug) return respond({ ok: false, error: 'Missing slug' }, 400);
   await env.LYRICS_DB.prepare('DELETE FROM songs WHERE slug = ?;').bind(slug).run();
