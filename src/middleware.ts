@@ -39,6 +39,24 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     context.locals.isAdmin = true;
   }
 
-  const response = await next();
-  return applySecurityHeaders(response);
+  try {
+    const response = await next();
+    return applySecurityHeaders(response);
+  } catch (err) {
+    const message = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+    const stack = err instanceof Error && err.stack ? err.stack : '';
+    console.error('Request error', { path: url.pathname, message, stack });
+    return applySecurityHeaders(
+      new Response(
+        import.meta.env.PROD ? `Error: ${message}` : `Error: ${message}\n${stack}`,
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+            'X-Error-Message': message,
+          },
+        },
+      ),
+    );
+  }
 };
