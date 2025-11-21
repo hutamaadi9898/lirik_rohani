@@ -11,3 +11,5 @@
 - Trim/normalize tokens across middleware/session, add safe JSON fallback only when Authorization header blocked, documented need to set ADMIN_TOKEN for both Pages preview and production; still pending deploy+secret set to clear 401 in preview.
 2025-11-21
 - Exempted `/api/admin/session` from middleware auth so session verification happens only in the handler (covers environments that strip Authorization before middleware).
+2025-11-21
+- Hardened `/api/admin/songs` POST with JSON validation, missing-binding guard, and D1 error handling to return clean JSON instead of 500s; added DB guard to GET/DELETE.

@@ -51,6 +51,7 @@ export const OPTIONS: APIRoute = ({ request }) => {
 export const GET: APIRoute = async ({ locals, request }) => {
   const env = (locals.runtime?.env ?? {}) as Env;
   if (!checkAuth(request, env, locals)) return respond({ ok: false, error: 'Unauthorized' }, 401);
+  if (!env.LYRICS_DB) return respond({ ok: false, error: 'Database not bound' }, 500);
   const { results } = await env.LYRICS_DB.prepare(
     'SELECT id, slug, title, artist, language FROM songs ORDER BY updated_at DESC LIMIT 200;',
   ).all();
@@ -60,24 +61,38 @@ export const GET: APIRoute = async ({ locals, request }) => {
 export const POST: APIRoute = async ({ locals, request }) => {
   const env = (locals.runtime?.env ?? {}) as Env;
   if (!checkAuth(request, env, locals)) return respond({ ok: false, error: 'Unauthorized' }, 401);
-  const body = await request.json();
-  const { slug, title, artist, language = 'id', body: lyrics } = body;
+  if (!env.LYRICS_DB) return respond({ ok: false, error: 'Database not bound' }, 500);
+
+  const body = (await request.json().catch(() => null)) as
+    | { slug?: unknown; title?: unknown; artist?: unknown; language?: unknown; body?: unknown }
+    | null;
+  if (!body) return respond({ ok: false, error: 'Invalid JSON' }, 400);
+  const title = typeof body.title === 'string' ? body.title.trim() : '';
+  const lyrics = typeof body.body === 'string' ? body.body : '';
+  const slugRaw = typeof body.slug === 'string' ? body.slug : '';
+  const artist = typeof body.artist === 'string' ? body.artist : null;
+  const language = typeof body.language === 'string' ? body.language : 'id';
   if (!title || !lyrics) return respond({ ok: false, error: 'Missing fields' }, 400);
 
-  const finalSlug = slug?.trim() ? slugify(slug) : slugify(title);
+  const finalSlug = slugRaw?.trim() ? slugify(slugRaw) : slugify(title);
 
-  await env.LYRICS_DB.prepare(
-    `INSERT INTO songs (id, slug, title, artist, language, body, created_at, updated_at)
-     VALUES (lower(hex(randomblob(16))), ?, ?, ?, ?, ?, unixepoch(), unixepoch())
-     ON CONFLICT(slug) DO UPDATE SET
-       title=excluded.title,
-       artist=excluded.artist,
-       language=excluded.language,
-       body=excluded.body,
-       updated_at=unixepoch();`,
-  )
-    .bind(finalSlug, title, artist, language, lyrics)
-    .run();
+  try {
+    await env.LYRICS_DB.prepare(
+      `INSERT INTO songs (id, slug, title, artist, language, body, created_at, updated_at)
+       VALUES (lower(hex(randomblob(16))), ?, ?, ?, ?, ?, unixepoch(), unixepoch())
+       ON CONFLICT(slug) DO UPDATE SET
+         title=excluded.title,
+         artist=excluded.artist,
+         language=excluded.language,
+         body=excluded.body,
+         updated_at=unixepoch();`,
+    )
+      .bind(finalSlug, title, artist, language, lyrics)
+      .run();
+  } catch (err) {
+    console.error('D1 insert error', err);
+    return respond({ ok: false, error: 'Server error' }, 500);
+  }
 
   await env.LYRICS_CACHE?.delete(`search:${finalSlug}`);
   await log(env, 'upsert', { slug: finalSlug, title });
@@ -87,6 +102,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 export const DELETE: APIRoute = async ({ locals, url, request }) => {
   const env = (locals.runtime?.env ?? {}) as Env;
   if (!checkAuth(request, env, locals)) return respond({ ok: false, error: 'Unauthorized' }, 401);
+  if (!env.LYRICS_DB) return respond({ ok: false, error: 'Database not bound' }, 500);
   const slug = url.searchParams.get('slug');
   if (!slug) return respond({ ok: false, error: 'Missing slug' }, 400);
   await env.LYRICS_DB.prepare('DELETE FROM songs WHERE slug = ?;').bind(slug).run();
