@@ -23,3 +23,5 @@
 - Strengthened song body coercion (parses JSON strings, handles nested body/text, suppresses “[object Object]” and shows fallback copy).
 2025-11-21
 - Normalized song page query (CASE/CAST/JSON) so bodies come back as text even when stored as non-text blobs.
+2025-11-21
+- Added broader body coercion (arrays, nested, JSON strings, [object Object]) to fully suppress bad rendering on song pages.
