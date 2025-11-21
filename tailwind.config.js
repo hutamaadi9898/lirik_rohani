@@ -7,12 +7,13 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Inter var"', 'Inter', 'ui-sans-serif', 'system-ui'],
+        sans: ['"Space Grotesk"', 'Inter', 'ui-sans-serif', 'system-ui'],
+        display: ['"Space Grotesk"', 'Inter', 'ui-sans-serif', 'system-ui'],
       },
       colors: {
-        surface: '#0c1116',
-        card: '#111820',
-        accent: '#7dd3fc',
+        surface: '#080c12',
+        card: '#0f1724',
+        accent: '#67e8f9',
       },
     },
   },

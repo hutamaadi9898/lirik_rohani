@@ -40,6 +40,7 @@ Goal: Ship a fast, mobile-first Astro 5.16 app for searching Indonesian worship 
 - [ ] P99 latency SLO (<75ms warm) measured and logged
 
 ## Phase 2 — Polish, observability, growth
+- [x] Refresh public UI (modern font, lucide icons, motion, faster-feel search)
 - [ ] Feature flags via KV for staged rollouts
 - [ ] Analytics + structured logs
 - [ ] Accessibility pass (screen reader labels, contrast, reduced motion)

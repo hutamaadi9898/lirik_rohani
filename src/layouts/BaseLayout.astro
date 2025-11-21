@@ -15,7 +15,7 @@ const url = Astro.site?.href ?? '';
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <meta property="og:title" content={title} />
@@ -26,8 +26,13 @@ const url = Astro.site?.href ?? '';
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
   </head>
-  <body class="min-h-screen antialiased">
-    <main class="mx-auto flex min-h-screen max-w-4xl flex-col px-4 pb-16 pt-10 sm:px-6">
+  <body class="relative min-h-screen font-sans antialiased">
+    <div class="pointer-events-none fixed inset-0 overflow-hidden">
+      <div class="absolute -left-20 top-0 h-72 w-72 rounded-full bg-cyan-400/15 blur-3xl" />
+      <div class="absolute right-0 top-24 h-80 w-80 rounded-full bg-indigo-500/10 blur-3xl" />
+      <div class="absolute inset-x-10 top-40 h-64 rounded-[32px] bg-gradient-to-r from-white/5 via-white/8 to-white/5 blur-xl" />
+    </div>
+    <main class="relative z-10 mx-auto flex min-h-screen max-w-5xl flex-col px-4 pb-16 pt-12 sm:px-8">
       <slot />
     </main>
   </body>
