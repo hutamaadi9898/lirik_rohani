@@ -25,3 +25,4 @@
 - Normalized song page query (CASE/CAST/JSON) so bodies come back as text even when stored as non-text blobs.
 2025-11-21
 - Added broader body coercion (arrays, nested, JSON strings, [object Object]) to fully suppress bad rendering on song pages.
+2025-11-21 - Hardened song detail rendering (recursive string extraction + artist sanitization) to eliminate residual "[object Object]" cases including the "lihat" lyrics.

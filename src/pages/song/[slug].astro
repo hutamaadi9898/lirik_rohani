@@ -9,10 +9,10 @@ const env = runtime?.env as Env | undefined;
 
 type SongRow = {
   id: string;
-  title: string;
-  artist: string | null;
-  language: string | null;
-  body_text: string | null;
+  title: unknown;
+  artist: unknown;
+  language: unknown;
+  body_text: unknown;
   slug: string;
   created_at: number;
   updated_at: number;
@@ -48,72 +48,82 @@ if (!song) {
   return Astro.redirect('/404');
 }
 
-const coerceBody = (raw: unknown): string => {
-  const normalizeString = (val: string) => {
-    const trimmed = val.trim();
-    if (!trimmed) return '';
-    if (trimmed === '[object Object]') return '';
-    if (trimmed.startsWith('["') && trimmed.endsWith('"]')) {
-      // JSON array of lines as string
+const visited = new WeakSet<object>();
+
+const toStrings = (value: unknown): string[] => {
+  if (value === null || value === undefined) return [];
+
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed || trimmed === '[object Object]' || trimmed === '"[object Object]"') return [];
+
+    const looksJson =
+      (trimmed.startsWith('{') && trimmed.endsWith('}')) ||
+      (trimmed.startsWith('[') && trimmed.endsWith(']')) ||
+      (trimmed.startsWith('"') && trimmed.endsWith('"'));
+
+    if (looksJson) {
       try {
-        const arr = JSON.parse(trimmed) as unknown;
-        if (Array.isArray(arr)) return arr.filter((x) => typeof x === 'string').join('\n');
+        return toStrings(JSON.parse(trimmed));
       } catch {
-        /* ignore */
+        /* fall back to raw string */
       }
     }
-    // Try to decode JSON string
-    try {
-      const parsed = JSON.parse(trimmed) as unknown;
-      if (typeof parsed === 'string') return parsed;
-      if (Array.isArray(parsed)) return parsed.filter((x) => typeof x === 'string').join('\n');
-      if (parsed && typeof parsed === 'object') {
-        // @ts-expect-error dynamic lookup
-        if (typeof parsed.body === 'string') return parsed.body;
-        // @ts-expect-error dynamic lookup
-        if (typeof parsed.text === 'string') return parsed.text;
+
+    return trimmed
+      .split(/\r?\n/)
+      .map((line) => line.trimEnd())
+      .filter((line) => line !== '[object Object]');
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap((entry) => toStrings(entry));
+  }
+
+  if (typeof value === 'object') {
+    if (visited.has(value as object)) return [];
+    visited.add(value as object);
+
+    const obj = value as Record<string, unknown>;
+    const preferred = ['body', 'text', 'lyrics', 'lines', 'verses', 'chorus', 'bridge', 'refrain', 'content'];
+    for (const key of preferred) {
+      if (key in obj) {
+        const nested = toStrings(obj[key]);
+        if (nested.length) return nested;
       }
-    } catch {
-      /* not JSON, use raw */
     }
-    return trimmed;
-  };
 
-  if (typeof raw === 'string') return normalizeString(raw);
-
-  if (Array.isArray(raw)) {
-    return raw.filter((x) => typeof x === 'string').join('\n');
+    return Object.values(obj).flatMap((entry) => toStrings(entry));
   }
 
-  if (raw && typeof raw === 'object') {
-    // @ts-expect-error dynamic lookup
-    if (typeof raw.body === 'string') return normalizeString(raw.body);
-    // @ts-expect-error dynamic lookup
-    if (Array.isArray(raw.body)) return raw.body.filter((x) => typeof x === 'string').join('\n');
-    // @ts-expect-error dynamic lookup
-    if (typeof raw.text === 'string') return normalizeString(raw.text);
-    try {
-      return JSON.stringify(raw, null, 2);
-    } catch {
-      return String(raw ?? '');
-    }
-  }
-
-  return '';
+  const str = String(value);
+  if (!str || str === '[object Object]') return [];
+  return [str];
 };
 
+const coerceBody = (raw: unknown): string => toStrings(raw).join('\n');
+
+const titleText = typeof song.title === 'string' ? song.title : String(song.title ?? '');
+const artistText = (() => {
+  if (!song.artist) return null;
+  if (typeof song.artist === 'string') return song.artist;
+  const picked = toStrings(song.artist)[0];
+  return picked ?? JSON.stringify(song.artist);
+})();
+const languageText = typeof song.language === 'string' && song.language.trim() ? song.language : 'id';
+
 const bodyText = coerceBody(song.body_text);
-const pageTitle = `${song.title} — Lirik Rohani`;
-const description = song.artist
-  ? `Lirik "${song.title}" oleh ${song.artist}`
-  : `Lirik "${song.title}"`;
+const pageTitle = `${titleText} — Lirik Rohani`;
+const description = artistText
+  ? `Lirik "${titleText}" oleh ${artistText}`
+  : `Lirik "${titleText}"`;
 
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'MusicRecording',
-  name: song.title,
-  inLanguage: song.language ?? 'id',
-  byArtist: song.artist ? { '@type': 'MusicGroup', name: song.artist } : undefined,
+  name: titleText,
+  inLanguage: languageText,
+  byArtist: artistText ? { '@type': 'MusicGroup', name: artistText } : undefined,
   url: `${Astro.url.origin}/song/${song.slug}`,
   datePublished: new Date((song.created_at ?? 0) * 1000).toISOString(),
   dateModified: new Date((song.updated_at ?? song.created_at ?? 0) * 1000).toISOString(),
@@ -124,8 +134,8 @@ const jsonLd = {
   <article class="space-y-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6 shadow-lg shadow-cyan-500/5">
     <header class="space-y-2">
       <p class="text-xs uppercase tracking-[0.2em] text-cyan-300/80">Lirik Lagu Rohani</p>
-      <h1 class="text-3xl font-semibold text-slate-50">{song.title}</h1>
-      {song.artist && <p class="text-sm text-slate-400">oleh {song.artist}</p>}
+      <h1 class="text-3xl font-semibold text-slate-50">{titleText}</h1>
+      {artistText && <p class="text-sm text-slate-400">oleh {artistText}</p>}
     </header>
     <div class="prose prose-invert max-w-none leading-relaxed text-slate-100">
       {bodyText
