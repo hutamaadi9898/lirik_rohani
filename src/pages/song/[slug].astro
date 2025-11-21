@@ -7,20 +7,38 @@ const slug = Astro.params.slug!;
 const runtime = Astro.locals.runtime;
 const env = runtime?.env as Env | undefined;
 
-let song: {
+type SongRow = {
   id: string;
   title: string;
   artist: string | null;
   language: string | null;
-  body: string;
+  body_text: string | null;
   slug: string;
   created_at: number;
   updated_at: number;
-} | null = null;
+};
+
+let song: SongRow | null = null;
 
 if (env?.LYRICS_DB) {
   song = await env.LYRICS_DB.prepare(
-    `SELECT id, title, artist, language, body, slug, created_at, updated_at FROM songs WHERE slug = ? LIMIT 1;`,
+    `SELECT
+       id,
+       title,
+       artist,
+       language,
+       -- Normalize body to text to avoid "[object Object]" or JSON blobs
+       CASE
+         WHEN typeof(body) = 'text' THEN body
+         WHEN json_valid(body) THEN json_extract(body, '$')
+         ELSE CAST(body AS TEXT)
+       END AS body_text,
+       slug,
+       created_at,
+       updated_at
+     FROM songs
+     WHERE slug = ?
+     LIMIT 1;`,
   )
     .bind(slug)
     .first();
@@ -63,7 +81,7 @@ const coerceBody = (raw: unknown): string => {
   return '';
 };
 
-const bodyText = coerceBody(song.body);
+const bodyText = coerceBody(song.body_text);
 const pageTitle = `${song.title} — Lirik Rohani`;
 const description = song.artist
   ? `Lirik "${song.title}" oleh ${song.artist}`
