@@ -42,6 +42,7 @@ Goal: Ship a fast, mobile-first Astro 5.16 app for searching Indonesian worship 
 ## Phase 2 — Polish, observability, growth
 - [x] Refresh public UI (modern font, lucide icons, motion, faster-feel search)
 - [x] Minimalist polish (remove jargon, softer animations, cleaner lyrics page)
+- [x] SEO plan drafted for slug indexing & launch readiness
 - [ ] Feature flags via KV for staged rollouts
 - [ ] Analytics + structured logs
 - [ ] Accessibility pass (screen reader labels, contrast, reduced motion)

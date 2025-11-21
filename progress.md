@@ -33,3 +33,5 @@
 2025-11-21 - Middleware now patches broken `/song/*` responses on the fly (uses DB to re-render HTML when body equals "[object Object]") and logs body length/snippet for Cloudflare tailing.
 2025-11-21 - Refreshed public UI with Space Grotesk font, lucide icons, animated search card, faster-feel debounced search, and a redesigned lyrics detail layout.
 2025-11-21 - Minimalist UI pass: simplified hero copy (no tech terms), calmer animations, lighter search island, cleaner lyrics page shell; added ui_improvement_plan.md checklist.
+2025-11-21 - Improved lyrics formatting (turn multiple spaces into line breaks), drafted SEO_plan.md with subatomic checklist for crawl/index readiness, and marked SEO plan in phase checklist.
+2025-11-21 - Implemented SEO plan steps: set Astro site url, added canonical tags, OG URLs, role="main", admin disallow in robots, caching on song pages, updated sitemap and JSON-LD references.

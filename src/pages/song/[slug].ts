@@ -20,7 +20,7 @@ const normalizeBody = (value: unknown): string => {
   return String(value);
 };
 
-export const GET: APIRoute = async ({ params, locals }) => {
+export const GET: APIRoute = async ({ params, locals, request }) => {
   const slug = params.slug ?? '';
   const env = (locals.runtime?.env ?? {}) as Env;
 
@@ -45,6 +45,9 @@ export const GET: APIRoute = async ({ params, locals }) => {
   const artistText = typeof row.artist === 'string' ? row.artist : null;
   const languageText = typeof row.language === 'string' && row.language.trim() ? row.language : 'id';
   const bodyText = normalizeBody(row.body);
+  const formattedBody = bodyText.replace(/[^\S\r\n]{2,}/g, '\n').trim();
+  const requestUrl = new URL(request.url);
+  const canonicalUrl = `${requestUrl.origin}/song/${slug}`;
   const updatedHuman = new Date((row.updated_at ?? row.created_at ?? 0) * 1000).toLocaleDateString('id-ID', {
     day: '2-digit',
     month: 'short',
@@ -57,7 +60,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
     name: titleText,
     inLanguage: languageText,
     byArtist: artistText ? { '@type': 'MusicGroup', name: artistText } : undefined,
-    url: `/song/${slug}`,
+    url: canonicalUrl,
     datePublished: new Date((row.created_at ?? 0) * 1000).toISOString(),
     dateModified: new Date((row.updated_at ?? row.created_at ?? 0) * 1000).toISOString(),
   };
@@ -72,6 +75,8 @@ export const GET: APIRoute = async ({ params, locals }) => {
   <meta property="og:title" content="${titleText} — Lirik Rohani" />
   <meta property="og:description" content="${artistText ? `Lirik \"${titleText}\" oleh ${artistText}` : `Lirik \"${titleText}\"`}" />
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="${canonicalUrl}" />
+  <link rel="canonical" href="${canonicalUrl}" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -164,7 +169,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
     </header>
 
     <article>
-      <pre>${bodyText || 'Lirik belum tersedia.'}</pre>
+      <pre>${formattedBody || 'Lirik belum tersedia.'}</pre>
     </article>
   </main>
 </body>
@@ -172,6 +177,9 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
   return new Response(html, {
     status: 200,
-    headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': 'public, max-age=300, stale-while-revalidate=86400',
+    },
   });
 };

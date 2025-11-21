@@ -6,6 +6,7 @@ import tailwind from '@astrojs/tailwind';
 
 // https://astro.build/config
 export default defineConfig({
+  site: process.env.SITE_URL ?? 'https://lirikrohani.example',
   adapter: cloudflare({
     platformProxy: {
       enabled: true,
