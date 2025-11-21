@@ -62,6 +62,25 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
         }),
       );
     }
+    // Inspect song page responses to catch unexpected bodies.
+    if (url.pathname.startsWith('/song/')) {
+      try {
+        const clone = response.clone();
+        const text = await clone.text();
+        const snippet = text.slice(0, 120);
+        response.headers.set('X-Debug-Body-Len', `${text.length}`);
+        response.headers.set('X-Debug-Body-Snippet', snippet);
+        console.log('Song response debug', {
+          path: url.pathname,
+          status: response.status,
+          len: text.length,
+          snippet,
+          debugVersion,
+        });
+      } catch (err) {
+        console.error('Song response debug read failed', err);
+      }
+    }
     return applySecurityHeaders(response);
   } catch (err) {
     const message = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
