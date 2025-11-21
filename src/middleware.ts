@@ -50,16 +50,17 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   ]);
 
   const applySecurityHeaders = (response: Response) => {
-    response.headers.set('X-Content-Type-Options', 'nosniff');
-    response.headers.set('Referrer-Policy', 'same-origin');
-    response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-    response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
-    response.headers.set('Cross-Origin-Resource-Policy', 'same-origin');
-    response.headers.set('X-Debug-Version', debugVersion);
+    const clone = new Response(response.body, response);
+    clone.headers.set('X-Content-Type-Options', 'nosniff');
+    clone.headers.set('Referrer-Policy', 'same-origin');
+    clone.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    clone.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
+    clone.headers.set('Cross-Origin-Resource-Policy', 'same-origin');
+    clone.headers.set('X-Debug-Version', debugVersion);
     if (import.meta.env.PROD) {
-      response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+      clone.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
     }
-    return response;
+    return clone;
   };
 
   const needsAuth =
