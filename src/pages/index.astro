@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SearchIsland from '../components/SearchIsland';
+import StatsIsland from '../components/StatsIsland';
 ---
 
 <BaseLayout title="Lirik Rohani Cepat" description="Cari lirik lagu rohani Indonesia dengan FTS5 super cepat di Cloudflare.">
@@ -16,6 +17,8 @@ import SearchIsland from '../components/SearchIsland';
         </p>
       </div>
     </div>
+
+    <StatsIsland client:only="react" />
 
     <SearchIsland client:only="react" />
   </section>

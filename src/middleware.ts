@@ -3,21 +3,51 @@ import { readBearer } from './lib/adminAuth';
 
 const PROTECTED_PREFIXES = ['/api/admin'];
 const AUTH_EXEMPT_PATHS = ['/api/admin/session'];
-const redirectMap: Record<string, string> = {
-  // legacy slugs -> new slugs
+
+const baseRedirectMap: Record<string, string> = {
+  // sample legacy slugs -> new slugs
   '/song/lagu-baru': '/song/lagu-baru-2025',
   '/song/kasih-setia': '/song/kasih-setia-tuhan',
-  // legacy uppercase or spaced slugs could be mapped here as they are discovered
 };
 
-const goneSlugs = new Set<string>([
-  '/song/lagu-dihapus',
-]);
+const baseGoneSlugs = new Set<string>(['/song/lagu-dihapus']);
+
+const parseMap = (json: string | undefined): Record<string, string> => {
+  if (!json) return {};
+  try {
+    const parsed = JSON.parse(json) as Record<string, string>;
+    return Object.fromEntries(
+      Object.entries(parsed)
+        .filter(([from, to]) => typeof from === 'string' && typeof to === 'string' && from && to)
+        .map(([from, to]) => [from.toLowerCase(), to]),
+    );
+  } catch {
+    return {};
+  }
+};
+
+const parseGone = (csv: string | undefined): Set<string> => {
+  if (!csv) return new Set();
+  return new Set(
+    csv
+      .split(',')
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean),
+  );
+};
 
 export const onRequest: MiddlewareHandler = async (context, next) => {
   const url = new URL(context.request.url);
   const debugVersion = 'song-debug-2025-11-21-6';
   const env = context.locals.runtime?.env as { LYRICS_DB?: D1Database } | undefined;
+  const redirectMap = {
+    ...baseRedirectMap,
+    ...parseMap(context.locals.runtime?.env?.REDIRECT_MAP_JSON as string | undefined),
+  };
+  const goneSlugs = new Set([
+    ...baseGoneSlugs,
+    ...parseGone(context.locals.runtime?.env?.GONE_SLUGS_CSV as string | undefined),
+  ]);
 
   const applySecurityHeaders = (response: Response) => {
     response.headers.set('X-Content-Type-Options', 'nosniff');

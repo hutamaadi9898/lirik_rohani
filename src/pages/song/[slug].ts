@@ -4,6 +4,7 @@ export const prerender = false;
 
 type Env = {
   LYRICS_DB: D1Database;
+  LYRICS_CACHE?: KVNamespace;
 };
 
 const normalizeBody = (value: unknown): string => {
@@ -46,6 +47,18 @@ export const GET: APIRoute = async ({ params, locals, request }) => {
   const languageText = typeof row.language === 'string' && row.language.trim() ? row.language : 'id';
   const bodyText = normalizeBody(row.body);
   const formattedBody = bodyText.replace(/[^\S\r\n]{2,}/g, '\n').trim();
+  let views = 0;
+  if (env.LYRICS_CACHE) {
+    const key = `pv:${slug}`;
+    const current = await env.LYRICS_CACHE.get(key);
+    views = Number(current ?? 0) || 0;
+    const sampleRate = 0.25; // write 25% of requests to reduce KV writes under load
+    if (Math.random() < sampleRate) {
+      const increment = 1 / sampleRate;
+      env.LYRICS_CACHE.put(key, String(views + increment));
+      views += increment;
+    }
+  }
   const requestUrl = new URL(request.url);
   const canonicalUrl = `${requestUrl.origin}/song/${slug}`;
   const updatedHuman = new Date((row.updated_at ?? row.created_at ?? 0) * 1000).toLocaleDateString('id-ID', {
@@ -189,6 +202,7 @@ export const GET: APIRoute = async ({ params, locals, request }) => {
     </header>
 
     <article>
+      <p class="subtle">Dilihat ${Math.round(views).toLocaleString('id-ID')} kali</p>
       <pre>${formattedBody || 'Lirik belum tersedia.'}</pre>
     </article>
   </main>
