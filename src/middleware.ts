@@ -6,7 +6,7 @@ const AUTH_EXEMPT_PATHS = ['/api/admin/session'];
 
 export const onRequest: MiddlewareHandler = async (context, next) => {
   const url = new URL(context.request.url);
-  const debugVersion = 'song-debug-2025-11-21-5';
+  const debugVersion = 'song-debug-2025-11-21-6';
 
   const applySecurityHeaders = (response: Response) => {
     response.headers.set('X-Content-Type-Options', 'nosniff');
@@ -43,6 +43,25 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
 
   try {
     const response = await next();
+    if (!(response instanceof Response)) {
+      const body = JSON.stringify(
+        {
+          error: 'Non-Response returned from route',
+          type: typeof response,
+          keys: response && typeof response === 'object' ? Object.keys(response) : [],
+          debugVersion,
+          path: url.pathname,
+        },
+        null,
+        2,
+      );
+      return applySecurityHeaders(
+        new Response(body, {
+          status: 500,
+          headers: { 'Content-Type': 'application/json; charset=utf-8' },
+        }),
+      );
+    }
     return applySecurityHeaders(response);
   } catch (err) {
     const message = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
