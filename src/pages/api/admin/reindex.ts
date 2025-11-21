@@ -14,3 +14,5 @@ export const POST: APIRoute = async ({ locals }) => {
   }
   return respond({ ok: true });
 };
+
+export const prerender = false;
