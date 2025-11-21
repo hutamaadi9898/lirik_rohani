@@ -37,3 +37,4 @@
 2025-11-21 - Implemented SEO plan steps: set Astro site url, added canonical tags, OG URLs, role="main", admin disallow in robots, caching on song pages, updated sitemap and JSON-LD references.
 2025-11-21 - Added redirect map + clean slug guard in middleware, prefetch for search results, breadcrumb JSON-LD on song pages, and custom 404 page; updated SEO checklist accordingly.
 2025-11-21 - Expanded redirect map with 410 handling for removed slugs; marked 404/410 item done in SEO plan.
+2025-11-21 - Middleware now redirects unknown routes to custom /404 page to keep UX consistent.
