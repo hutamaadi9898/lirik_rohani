@@ -1,4 +1,4 @@
-import { useEffect, useState, FormEvent } from 'react';
+import { useState, FormEvent } from 'react';
 
 type Song = {
   id?: string;
@@ -16,6 +16,7 @@ export default function AdminIsland() {
   const [list, setList] = useState<Song[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [authed, setAuthed] = useState(false);
   const [form, setForm] = useState<Song>({
     slug: '',
     title: '',
@@ -35,12 +36,34 @@ export default function AdminIsland() {
     setLoading(false);
   };
 
-  useEffect(() => {
-    if (token) load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
+  const authAndLoad = async (e: FormEvent) => {
+    e.preventDefault();
+    setMessage(null);
+    if (!token) {
+      setMessage('Masukkan token');
+      return;
+    }
+    const res = await fetch(`/api/admin/songs?token=${encodeURIComponent(token)}`, { method: 'GET' });
+    if (res.ok) {
+      setAuthed(true);
+      await load();
+    } else {
+      setAuthed(false);
+      setMessage('Token salah atau tidak diisi');
+    }
+  };
 
-  const submit = async (e: FormEvent) => {
+  const remove = async (slug: string) => {
+    const res = await fetch(`/api/admin/songs?slug=${encodeURIComponent(slug)}`, {
+      method: 'DELETE',
+      headers,
+    });
+    const json = (await res.json()) as ApiResponse<null>;
+    setMessage(json.ok ? 'Dihapus' : json.error);
+    if (json.ok) load();
+  };
+
+  const submitSong = async (e: FormEvent) => {
     e.preventDefault();
     setMessage(null);
     const res = await fetch('/api/admin/songs', {
@@ -59,16 +82,6 @@ export default function AdminIsland() {
     } else setMessage(json.error);
   };
 
-  const remove = async (slug: string) => {
-    const res = await fetch(`/api/admin/songs?slug=${encodeURIComponent(slug)}`, {
-      method: 'DELETE',
-      headers,
-    });
-    const json = (await res.json()) as ApiResponse<null>;
-    setMessage(json.ok ? 'Dihapus' : json.error);
-    if (json.ok) load();
-  };
-
   const rebuild = async () => {
     const res = await fetch('/api/admin/reindex', { method: 'POST', headers });
     const json = (await res.json()) as ApiResponse<null>;
@@ -77,20 +90,31 @@ export default function AdminIsland() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
+      <form onSubmit={authAndLoad} className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
         <label className="text-sm text-slate-300">Admin token</label>
-        <input
-          className="mt-2 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-slate-50"
-          placeholder="Paste ADMIN_TOKEN"
-          value={token}
-          onChange={(e) => setToken(e.target.value)}
-        />
+        <div className="mt-2 flex gap-2">
+          <input
+            className="flex-1 rounded border border-slate-700 bg-slate-800 px-3 py-2 text-slate-50"
+            placeholder="Paste ADMIN_TOKEN"
+            value={token}
+            onChange={(e) => setToken(e.target.value)}
+          />
+          <button
+            className="rounded bg-cyan-500 px-3 py-2 text-sm font-semibold text-slate-950 hover:bg-cyan-400"
+            type="submit"
+          >
+            Masuk
+          </button>
+        </div>
+        {!authed && <p className="mt-2 text-xs text-slate-500">Token wajib untuk memuat dashboard.</p>}
       </div>
 
-      <form onSubmit={submit} className="space-y-3 rounded-lg border border-slate-800 bg-slate-900/60 p-4">
-        <div className="grid gap-3 md:grid-cols-2">
-          <Input label="Slug" value={form.slug} onChange={(v) => setForm({ ...form, slug: v })} required />
-          <Input label="Judul" value={form.title} onChange={(v) => setForm({ ...form, title: v })} required />
+      {authed && (
+        <>
+          <form onSubmit={submitSong} className="space-y-3 rounded-lg border border-slate-800 bg-slate-900/60 p-4">
+            <div className="grid gap-3 md:grid-cols-2">
+              <Input label="Slug" value={form.slug} onChange={(v) => setForm({ ...form, slug: v })} required />
+              <Input label="Judul" value={form.title} onChange={(v) => setForm({ ...form, title: v })} required />
           <Input label="Artist" value={form.artist ?? ''} onChange={(v) => setForm({ ...form, artist: v })} />
           <Input
             label="Bahasa"
@@ -113,49 +137,51 @@ export default function AdminIsland() {
         >
           Simpan
         </button>
-      </form>
+            </form>
 
       {message && <p className="text-sm text-cyan-200">{message}</p>}
 
-      <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-50">Daftar Lagu</h2>
-          <button
-            type="button"
-            onClick={load}
-            className="rounded border border-slate-700 px-3 py-1 text-xs text-slate-200 hover:border-cyan-400"
-          >
-            Refresh
-          </button>
-        </div>
-        <button
-          type="button"
-          onClick={rebuild}
-          className="mt-3 rounded border border-slate-700 px-3 py-1 text-xs text-cyan-200 hover:border-cyan-400"
-        >
-          Rebuild FTS index
-        </button>
-        {loading ? (
-          <p className="mt-3 text-sm text-slate-400">Memuat…</p>
-        ) : (
-          <ul className="mt-3 space-y-2">
-            {list.map((item) => (
-              <li key={item.slug} className="flex items-center justify-between rounded border border-slate-800 px-3 py-2">
-                <div>
-                  <p className="text-sm font-semibold text-slate-50">{item.title}</p>
-                  <p className="text-xs text-slate-500">{item.slug}</p>
-                </div>
-                <button
-                  className="text-xs text-rose-300 hover:text-rose-200"
-                  onClick={() => remove(item.slug)}
-                >
-                  Hapus
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-slate-50">Daftar Lagu</h2>
+              <button
+                type="button"
+                onClick={load}
+                className="rounded border border-slate-700 px-3 py-1 text-xs text-slate-200 hover:border-cyan-400"
+              >
+                Refresh
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={rebuild}
+              className="mt-3 rounded border border-slate-700 px-3 py-1 text-xs text-cyan-200 hover:border-cyan-400"
+            >
+              Rebuild FTS index
+            </button>
+            {loading ? (
+              <p className="mt-3 text-sm text-slate-400">Memuat…</p>
+            ) : (
+              <ul className="mt-3 space-y-2">
+                {list.map((item) => (
+                  <li key={item.slug} className="flex items-center justify-between rounded border border-slate-800 px-3 py-2">
+                    <div>
+                      <p className="text-sm font-semibold text-slate-50">{item.title}</p>
+                      <p className="text-xs text-slate-500">{item.slug}</p>
+                    </div>
+                    <button
+                      className="text-xs text-rose-300 hover:text-rose-200"
+                      onClick={() => remove(item.slug)}
+                    >
+                      Hapus
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
