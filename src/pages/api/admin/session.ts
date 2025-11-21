@@ -11,10 +11,16 @@ const respond = (obj: unknown, status = 200, extraHeaders: Record<string, string
 
 export const POST: APIRoute = async ({ locals, request }) => {
   const env = locals.runtime?.env as Env;
-  const expected = env.ADMIN_TOKEN;
-  if (!expected) return respond({ ok: false, error: 'Admin token not configured' }, 401);
+  const expected = env.ADMIN_TOKEN?.trim();
+  if (!expected) return respond({ ok: false, error: 'Unauthorized' }, 401);
 
-  const provided = readBearer(request);
+  // Prefer Authorization header; fall back to JSON body token only if header missing.
+  let provided = readBearer(request)?.trim();
+  if (!provided) {
+    const body = (await request.json().catch(() => null)) as { token?: string } | null;
+    provided = body?.token?.trim();
+  }
+
   if (!provided || provided !== expected) return respond({ ok: false, error: 'Unauthorized' }, 401);
 
   const maxAgeSeconds = 60 * 60 * 12;

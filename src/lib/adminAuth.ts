@@ -4,6 +4,8 @@ type AdminEnv = {
   ADMIN_TOKEN?: string;
 };
 
+const clean = (value: string | null | undefined) => value?.trim() ?? '';
+
 const parseCookie = (cookieHeader: string | null, key: string) => {
   if (!cookieHeader) return null;
   return (
@@ -31,8 +33,8 @@ export const isAdminAuthorized = (
   locals?: { isAdmin?: boolean },
 ): boolean => {
   if (locals?.isAdmin) return true;
-  const expected = env.ADMIN_TOKEN;
+  const expected = clean(env.ADMIN_TOKEN);
   if (!expected) return false;
-  const token = readBearer(request) || readAdminCookie(request);
-  return Boolean(token && token === expected);
+  const token = clean(readBearer(request)) || clean(readAdminCookie(request));
+  return Boolean(token) && token === expected;
 };

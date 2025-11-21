@@ -25,9 +25,9 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     if (!expected) return applySecurityHeaders(new Response('Unauthorized', { status: 401 }));
     const bearer = readBearer(context.request);
     const cookieToken = context.cookies.get('admin_token')?.value;
-    const token = bearer || cookieToken;
+    const token = bearer?.trim() || cookieToken?.trim();
 
-    const valid = token === expected;
+    const valid = token === expected?.trim();
 
     if (!valid) {
       return applySecurityHeaders(new Response('Unauthorized', { status: 401 }));

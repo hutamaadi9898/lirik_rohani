@@ -7,3 +7,5 @@
 2025-11-21
 - Fixed admin token login flow (new session endpoint + HttpOnly cookie) and removed query tokens; tightened middleware with security headers and strict auth; added credentialed fetches in AdminIsland; hardened admin API auth and CORS/no-store caching.
 - Adjusted session to accept Authorization header only (no token in request body), downgraded missing-secret responses to 401 to avoid 500s.
+2025-11-21
+- Trim/normalize tokens across middleware/session, add safe JSON fallback only when Authorization header blocked, documented need to set ADMIN_TOKEN for both Pages preview and production; still pending deploy+secret set to clear 401 in preview.

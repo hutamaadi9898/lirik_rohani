@@ -49,6 +49,8 @@ export default function AdminIsland() {
         ...(headers ?? {}),
       },
       credentials: 'same-origin',
+      // Only send body token if Authorization is blocked by the browser/network layer.
+      body: headers ? undefined : JSON.stringify({ token }),
     });
     if (!res.ok) {
       setAuthed(false);
