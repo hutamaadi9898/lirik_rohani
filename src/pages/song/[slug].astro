@@ -19,32 +19,37 @@ type SongRow = {
 };
 
 let song: SongRow | null = null;
+let loadError: string | null = null;
 
-if (env?.LYRICS_DB) {
-  song = await env.LYRICS_DB.prepare(
-    `SELECT
-       id,
-       title,
-       artist,
-       language,
-       -- Normalize body to text to avoid "[object Object]" or JSON blobs
-       CASE
-         WHEN typeof(body) = 'text' THEN body
-         WHEN json_valid(body) THEN json_extract(body, '$')
-         ELSE CAST(body AS TEXT)
-       END AS body_text,
-       slug,
-       created_at,
-       updated_at
-     FROM songs
-     WHERE slug = ?
-     LIMIT 1;`,
-  )
-    .bind(slug)
-    .first();
+try {
+  if (env?.LYRICS_DB) {
+    song = await env.LYRICS_DB.prepare(
+      `SELECT
+         id,
+         title,
+         artist,
+         language,
+         -- Normalize body to text to avoid "[object Object]" or JSON blobs
+         CASE
+           WHEN typeof(body) = 'text' THEN body
+           WHEN json_valid(body) THEN json_extract(body, '$')
+           ELSE CAST(body AS TEXT)
+         END AS body_text,
+         slug,
+         created_at,
+         updated_at
+       FROM songs
+       WHERE slug = ?
+       LIMIT 1;`,
+    )
+      .bind(slug)
+      .first();
+  }
+} catch (err) {
+  loadError = err instanceof Error ? err.message : String(err);
 }
 
-if (!song) {
+if (!song && !loadError) {
   return Astro.redirect('/404');
 }
 
@@ -103,16 +108,22 @@ const toStrings = (value: unknown): string[] => {
 
 const coerceBody = (raw: unknown): string => toStrings(raw).join('\n');
 
-const titleText = typeof song.title === 'string' ? song.title : String(song.title ?? '');
+const titleText = (() => {
+  if (song) return typeof song.title === 'string' ? song.title : String(song.title ?? '');
+  return 'Lirik tidak dapat dimuat';
+})();
+
 const artistText = (() => {
-  if (!song.artist) return null;
+  if (!song?.artist) return null;
   if (typeof song.artist === 'string') return song.artist;
   const picked = toStrings(song.artist)[0];
   return picked ?? JSON.stringify(song.artist);
 })();
-const languageText = typeof song.language === 'string' && song.language.trim() ? song.language : 'id';
 
-const bodyText = coerceBody(song.body_text);
+const languageText =
+  song && typeof song.language === 'string' && song.language.trim() ? song.language : 'id';
+
+const bodyText = coerceBody(song?.body_text);
 const pageTitle = `${titleText} — Lirik Rohani`;
 const description = artistText
   ? `Lirik "${titleText}" oleh ${artistText}`
@@ -128,9 +139,14 @@ const description = artistText
       {artistText && <p class="text-sm text-slate-400">oleh {artistText}</p>}
     </header>
     <div class="prose prose-invert max-w-none leading-relaxed text-slate-100">
-      {bodyText
+      {loadError && (
+        <p class="rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-100">
+          Gagal memuat lirik. {loadError}
+        </p>
+      )}
+      {!loadError && bodyText
         ? bodyText.split(/\r?\n/).map((line) => <p>{line || '\u00a0'}</p>)
-        : <p class="italic text-slate-400">Lirik belum tersedia.</p>}
+        : !loadError && <p class="italic text-slate-400">Lirik belum tersedia.</p>}
     </div>
   </article>
 
