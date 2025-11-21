@@ -7,6 +7,7 @@ const AUTH_EXEMPT_PATHS = ['/api/admin/session'];
 export const onRequest: MiddlewareHandler = async (context, next) => {
   const url = new URL(context.request.url);
   const debugVersion = 'song-debug-2025-11-21-6';
+  const env = context.locals.runtime?.env as { LYRICS_DB?: D1Database } | undefined;
 
   const applySecurityHeaders = (response: Response) => {
     response.headers.set('X-Content-Type-Options', 'nosniff');
@@ -70,6 +71,44 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
         const snippet = text.slice(0, 120);
         response.headers.set('X-Debug-Body-Len', `${text.length}`);
         response.headers.set('X-Debug-Body-Snippet', snippet);
+        // If the body is clearly wrong ("[object Object]"), patch it with a direct DB render.
+        const looksBroken = text.trim() === '[object Object]';
+        if (looksBroken && env?.LYRICS_DB) {
+          const slug = url.pathname.replace(/^\/?song\//, '').replace(/\/$/, '');
+          const row = await env.LYRICS_DB.prepare(
+            'SELECT id, slug, title, artist, language, typeof(body) AS body_type, body FROM songs WHERE slug = ? LIMIT 1;',
+          )
+            .bind(slug)
+            .first();
+          if (row) {
+            const toStrings = (value: unknown, seen = new WeakSet<object>()): string[] => {
+              if (value === null || value === undefined) return [];
+              if (typeof value === 'string') return value.split(/\\r?\\n/).map((l) => l.trim());
+              if (Array.isArray(value)) return value.flatMap((v) => toStrings(v, seen));
+              if (typeof value === 'object') {
+                if (seen.has(value as object)) return [];
+                seen.add(value as object);
+                return Object.values(value as Record<string, unknown>).flatMap((v) => toStrings(v, seen));
+              }
+              return [String(value)];
+            };
+
+            const bodyText = toStrings((row as any).body).filter(Boolean).join('\\n');
+            const titleText = typeof (row as any).title === 'string' ? (row as any).title : 'Lirik';
+            const artistText = typeof (row as any).artist === 'string' ? (row as any).artist : '';
+            const html = `<!doctype html><html lang=\"id\"><head><meta charset=\"utf-8\"/><title>${titleText}</title></head><body style=\"font-family:sans-serif;background:#0b1224;color:#e2e8f0;padding:24px;\"><h1>${titleText}</h1><p>${artistText}</p><pre style=\"white-space:pre-wrap\">${bodyText}</pre><p style=\"opacity:.6\">(fallback render)</p></body></html>`;
+            return applySecurityHeaders(
+              new Response(html, {
+                status: 200,
+                headers: {
+                  'Content-Type': 'text/html; charset=utf-8',
+                  'X-Debug-Fallback': 'applied',
+                  'X-Debug-Version': debugVersion,
+                },
+              }),
+            );
+          }
+        }
         console.log('Song response debug', {
           path: url.pathname,
           status: response.status,
