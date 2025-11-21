@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export const prerender = false;
+
+const slug = Astro.params.slug!;
+const runtime = Astro.locals.runtime;
+const env = runtime?.env as Env | undefined;
+
+let song: {
+  id: string;
+  title: string;
+  artist: string | null;
+  language: string | null;
+  body: string;
+  slug: string;
+  created_at: number;
+  updated_at: number;
+} | null = null;
+
+if (env?.LYRICS_DB) {
+  song = await env.LYRICS_DB.prepare(
+    `SELECT id, title, artist, language, body, slug, created_at, updated_at FROM songs WHERE slug = ? LIMIT 1;`,
+  )
+    .bind(slug)
+    .first();
+}
+
+if (!song) {
+  return Astro.redirect('/404');
+}
+
+const pageTitle = `${song.title} — Lirik Rohani`;
+const description = song.artist
+  ? `Lirik "${song.title}" oleh ${song.artist}`
+  : `Lirik "${song.title}"`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'MusicRecording',
+  name: song.title,
+  inLanguage: song.language ?? 'id',
+  byArtist: song.artist ? { '@type': 'MusicGroup', name: song.artist } : undefined,
+  url: `${Astro.url.origin}/song/${song.slug}`,
+  datePublished: new Date((song.created_at ?? 0) * 1000).toISOString(),
+  dateModified: new Date((song.updated_at ?? song.created_at ?? 0) * 1000).toISOString(),
+};
+---
+
+<BaseLayout title={pageTitle} description={description}>
+  <article class="space-y-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6 shadow-lg shadow-cyan-500/5">
+    <header class="space-y-2">
+      <p class="text-xs uppercase tracking-[0.2em] text-cyan-300/80">Lirik Lagu Rohani</p>
+      <h1 class="text-3xl font-semibold text-slate-50">{song.title}</h1>
+      {song.artist && <p class="text-sm text-slate-400">oleh {song.artist}</p>}
+    </header>
+    <div class="prose prose-invert max-w-none leading-relaxed text-slate-100">
+      {song.body.split('\n').map((line) => (
+        <p>{line || '\u00a0'}</p>
+      ))}
+    </div>
+  </article>
+
+  <script type="application/ld+json">
+    {JSON.stringify(jsonLd)}
+  </script>
+</BaseLayout>

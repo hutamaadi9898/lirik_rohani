@@ -1,14 +1,42 @@
 {
-  "name": "my-astro-app",
-  "type": "module",
-  "version": "0.0.1",
+	"name": "my-astro-app",
+	"type": "module",
+	"version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
+    "preview": "astro build && wrangler pages dev",
+    "astro": "astro",
+    "deploy": "astro build && wrangler pages deploy",
+    "cf-typegen": "wrangler types",
+    "check": "astro check && tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome format .",
+    "db:prepare": "drizzle-kit generate:sqlite",
+    "db:migrate": "wrangler d1 migrations apply LYRICS_DB",
+    "db:seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
-    "astro": "^5.16.0"
+    "@astrojs/cloudflare": "^12.6.11",
+    "@astrojs/react": "^4.4.2",
+    "@astrojs/tailwind": "^6.0.2",
+    "astro": "^5.16.0",
+    "drizzle-orm": "^0.44.7",
+    "framer-motion": "^12.23.24",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^3.4.18",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.7",
+    "@types/node": "^24.10.1",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.22",
+    "drizzle-kit": "^0.31.7",
+    "postcss": "^8.5.6",
+    "tsx": "^4.16.2",
+    "wrangler": "^4.50.0"
   }
 }

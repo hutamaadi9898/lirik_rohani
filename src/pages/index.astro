@@ -1,11 +1,19 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SearchIsland from '../components/SearchIsland';
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<BaseLayout title="Lirik Rohani Cepat" description="Cari lirik lagu rohani Indonesia dengan FTS5 super cepat di Cloudflare.">
+  <section class="space-y-6">
+    <div class="space-y-3">
+      <p class="text-xs uppercase tracking-[0.2em] text-cyan-300/80">FTS5 · Cloudflare Workers · D1</p>
+      <h1 class="text-3xl font-semibold leading-tight text-slate-50 sm:text-4xl">
+        Temukan lirik lagu rohani Indonesia dengan instan
+      </h1>
+      <p class="max-w-2xl text-base text-slate-300">
+        Pencarian judul atau potongan lirik, diproses di edge dengan D1 + FTS5 dan cache KV. Optimasi SEO dan mobile-first.
+      </p>
+    </div>
+    <SearchIsland client:only="react" />
+  </section>
+</BaseLayout>

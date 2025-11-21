@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdminIsland from '../../components/AdminIsland';
+---
+
+<BaseLayout title="Admin Lirik" description="Kelola lirik rohani">
+  <section class="space-y-6">
+    <div class="space-y-2">
+      <p class="text-xs uppercase tracking-[0.2em] text-cyan-300/80">Admin</p>
+      <h1 class="text-3xl font-semibold text-slate-50">Kelola Lirik</h1>
+      <p class="text-sm text-slate-400">Hanya untuk operator. Autentikasi via token.</p>
+    </div>
+    <AdminIsland client:only="react" />
+  </section>
+</BaseLayout>
