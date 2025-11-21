@@ -175,6 +175,7 @@ export function SearchIsland({ initialQuery = '' }: Props) {
           <motion.a
             key={item.id}
             href={`/song/${item.slug}`}
+            rel="prefetch"
             className="block rounded-2xl border border-white/5 bg-slate-950/70 p-4 shadow-sm transition hover:-translate-y-1 hover:border-cyan-400/60"
             variants={fade}
             initial="initial"

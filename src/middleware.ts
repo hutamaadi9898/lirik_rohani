@@ -3,6 +3,16 @@ import { readBearer } from './lib/adminAuth';
 
 const PROTECTED_PREFIXES = ['/api/admin'];
 const AUTH_EXEMPT_PATHS = ['/api/admin/session'];
+const redirectMap: Record<string, string> = {
+  // legacy slugs -> new slugs
+  '/song/lagu-baru': '/song/lagu-baru-2025',
+  '/song/kasih-setia': '/song/kasih-setia-tuhan',
+  // legacy uppercase or spaced slugs could be mapped here as they are discovered
+};
+
+const goneSlugs = new Set<string>([
+  '/song/lagu-dihapus',
+]);
 
 export const onRequest: MiddlewareHandler = async (context, next) => {
   const url = new URL(context.request.url);
@@ -25,6 +35,33 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   const needsAuth =
     !AUTH_EXEMPT_PATHS.includes(url.pathname) &&
     PROTECTED_PREFIXES.some((path) => url.pathname.startsWith(path));
+
+  // Legacy redirect map
+  if (redirectMap[url.pathname]) {
+    const target = redirectMap[url.pathname];
+    const location = url.search ? `${target}${url.search}` : target;
+    return applySecurityHeaders(Response.redirect(location, 301));
+  }
+
+  // 410 for removed songs/slugs
+  if (goneSlugs.has(url.pathname)) {
+    return applySecurityHeaders(
+      new Response('Halaman ini sudah tidak tersedia (410).', {
+        status: 410,
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+      }),
+    );
+  }
+
+  // Clean slug guard for song pages: lowercase + kebab, no trailing slash
+  if (url.pathname.startsWith('/song/')) {
+    const slugPart = url.pathname.replace(/^\/song\//, '').replace(/\/$/, '');
+    const normalized = slugPart.trim().toLowerCase().replace(/\s+/g, '-');
+    if (normalized && normalized !== slugPart) {
+      const target = `/song/${normalized}${url.search}`;
+      return applySecurityHeaders(Response.redirect(target, 301));
+    }
+  }
 
   if (needsAuth) {
     const expected = context.locals.runtime?.env?.ADMIN_TOKEN;

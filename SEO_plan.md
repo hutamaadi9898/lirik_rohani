@@ -7,16 +7,16 @@
 - [x] Maintain `robots.txt` allow rules; disallow only admin routes; verify `sitemap.xml` lists all slugs (song pages) and updates on deploy.
 - [x] Add `lastmod` for each song URL in sitemap sourced from `updated_at`.
 - [x] Generate static JSON-LD `MusicRecording` for song pages (already present) and validate against Search Console rich results.
-- [ ] Use clean slugs (lowercase, kebab) and stable 301 redirects for legacy/changed slugs.
-- [ ] Prefetch internal links on hover for search results (`rel="prefetch"` where supported) to speed user-perceived performance.
-- [ ] Add structured breadcrumbs (if navigation grows) via JSON-LD `BreadcrumbList`.
+- [x] Use clean slugs (lowercase, kebab) and stable 301 redirects for legacy/changed slugs.
+- [x] Prefetch internal links on hover for search results (`rel="prefetch"` where supported) to speed user-perceived performance.
+- [x] Add structured breadcrumbs (if navigation grows) via JSON-LD `BreadcrumbList`.
 - [x] Optimize font loading: add `font-display: swap` via Google Fonts URL and consider self-hosting to reduce CLS.
 - [ ] Image/OG hygiene: ensure share images are 1200x630 WebP/PNG and referenced in OG tags; fall back to logo if missing.
 - [x] Cache strategy: set `Cache-Control: public, max-age=300, stale-while-revalidate=86400` for song pages on Cloudflare; keep `api/search` short TTL.
 - [ ] Lighthouse/CLS: verify no layout shifts; ensure buttons/inputs have `:focus-visible` styles and tap targets >=48px.
 - [x] Accessibility aids (indirect SEO): use descriptive `aria-label` on search input/button and `role="main"` on primary container.
 - [ ] Monitoring: enable Google Search Console + Bing Webmaster; submit sitemap after each deploy; track crawl stats/errors.
-- [ ] 404/410 handling: custom 404 page with search prompt; return 410 for removed songs via redirect map.
+- [x] 404/410 handling: custom 404 page with search prompt; return 410 for removed songs via redirect map.
 - [ ] Internationalization readiness: if adding English, emit `hreflang` pairs and segregate sitemaps by locale.
 - [ ] Security headers: set `Content-Security-Policy`, `Referrer-Policy=strict-origin-when-cross-origin`, `X-Content-Type-Options=nosniff`.
 - [ ] Core Web Vitals budget: LCP <1.8s, CLS <0.1, TBT <150ms on 4G; monitor via Web-Vitals script or Cloudflare Analytics.

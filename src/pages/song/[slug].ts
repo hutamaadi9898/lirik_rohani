@@ -65,6 +65,25 @@ export const GET: APIRoute = async ({ params, locals, request }) => {
     dateModified: new Date((row.updated_at ?? row.created_at ?? 0) * 1000).toISOString(),
   };
 
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Beranda',
+        item: `${requestUrl.origin}/`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: titleText,
+        item: canonicalUrl,
+      },
+    ],
+  };
+
   const html = `<!doctype html>
 <html lang="id">
 <head>
@@ -153,6 +172,7 @@ export const GET: APIRoute = async ({ params, locals, request }) => {
     }
   </style>
   <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
+  <script type="application/ld+json">${JSON.stringify(breadcrumbLd)}</script>
 </head>
 <body>
   <main>
