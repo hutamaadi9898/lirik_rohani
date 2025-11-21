@@ -2,6 +2,7 @@ import type { MiddlewareHandler } from 'astro';
 import { readBearer } from './lib/adminAuth';
 
 const PROTECTED_PREFIXES = ['/api/admin'];
+const AUTH_EXEMPT_PATHS = ['/api/admin/session'];
 
 export const onRequest: MiddlewareHandler = async (context, next) => {
   const url = new URL(context.request.url);
@@ -18,7 +19,9 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     return response;
   };
 
-  const needsAuth = PROTECTED_PREFIXES.some((path) => url.pathname.startsWith(path));
+  const needsAuth =
+    !AUTH_EXEMPT_PATHS.includes(url.pathname) &&
+    PROTECTED_PREFIXES.some((path) => url.pathname.startsWith(path));
 
   if (needsAuth) {
     const expected = context.locals.runtime?.env?.ADMIN_TOKEN;
