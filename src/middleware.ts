@@ -1,6 +1,6 @@
 import type { MiddlewareHandler } from 'astro';
 
-const PROTECTED_PREFIXES = ['/admin', '/api/admin'];
+const PROTECTED_PREFIXES = ['/api/admin'];
 
 export const onRequest: MiddlewareHandler = async (context, next) => {
   const url = new URL(context.request.url);
@@ -15,11 +15,6 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     const token = bearer || queryToken || cookieToken;
 
     const valid = expected && token === expected;
-
-    // If token passed via query and valid, set cookie then redirect to clean URL (hiding token).
-    if (!valid && queryToken) {
-      return new Response('Unauthorized', { status: 401 });
-    }
 
     if (valid && queryToken) {
       const redirectUrl = new URL(url.href);
