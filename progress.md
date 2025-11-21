@@ -32,3 +32,4 @@
 2025-11-21 - Added `/api/debug-song` to inspect a slug's row/binding status remotely for diagnosing Pages issues.
 2025-11-21 - Middleware now patches broken `/song/*` responses on the fly (uses DB to re-render HTML when body equals "[object Object]") and logs body length/snippet for Cloudflare tailing.
 2025-11-21 - Refreshed public UI with Space Grotesk font, lucide icons, animated search card, faster-feel debounced search, and a redesigned lyrics detail layout.
+2025-11-21 - Minimalist UI pass: simplified hero copy (no tech terms), calmer animations, lighter search island, cleaner lyrics page shell; added ui_improvement_plan.md checklist.

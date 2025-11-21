@@ -84,108 +84,55 @@ export const GET: APIRoute = async ({ params, locals }) => {
       min-height: 100vh;
       font-family: 'Space Grotesk', 'Inter', system-ui, -apple-system, sans-serif;
       color: #e2e8f0;
-      background:
-        radial-gradient(circle at 20% -10%, rgba(56, 189, 248, 0.12), transparent 32%),
-        radial-gradient(circle at 85% 10%, rgba(94, 234, 212, 0.14), transparent 35%),
-        linear-gradient(140deg, #050a12 0%, #060910 45%, #050910 100%);
-    }
-    .shell {
-      position: relative;
-      z-index: 1;
-      width: min(960px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 44px 0 72px;
-    }
-    .glow {
-      position: fixed;
-      inset: -20% auto auto 30%;
-      height: 320px;
-      width: 320px;
-      background: radial-gradient(circle, rgba(14,165,233,0.18), transparent 55%);
-      filter: blur(48px);
-      opacity: 0.9;
-      animation: floaty 12s ease-in-out infinite alternate;
-    }
-    .card {
-      margin-top: 18px;
-      padding: 28px 26px 30px;
-      background: rgba(15, 23, 42, 0.82);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      border-radius: 22px;
-      box-shadow: 0 25px 60px rgba(8, 47, 73, 0.25);
-      backdrop-filter: blur(16px);
-    }
-    .hero {
+      background: #070b11;
       display: flex;
-      flex-direction: column;
-      gap: 10px;
+      justify-content: center;
     }
-    .eyebrow {
+    main {
+      width: min(820px, 100%);
+      padding: 32px 18px 72px;
+    }
+    a.back {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      font-size: 12px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255,255,255,0.08);
-      width: fit-content;
-      color: #a5f3fc;
+      padding: 10px 12px;
+      border-radius: 12px;
+      color: #cbd5e1;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.04);
+      transition: transform 140ms ease, border-color 140ms ease;
     }
-    .eyebrow-dot {
-      display: inline-block;
-      height: 8px;
-      width: 8px;
-      border-radius: 999px;
-      background: #34d399;
-      box-shadow: 0 0 0 8px rgba(52, 211, 153, 0.16);
-    }
+    a.back:hover { transform: translateX(-2px); border-color: rgba(103,232,249,0.6); }
+    header { margin: 18px 0 12px; }
     h1 {
-      margin: 0;
-      font-size: clamp(32px, 4vw, 44px);
-      line-height: 1.2;
+      margin: 6px 0 0;
+      font-size: clamp(30px, 4vw, 40px);
       letter-spacing: -0.02em;
       color: #f8fafc;
     }
-    .artist { margin: 0; color: #cbd5e1; font-size: 18px; }
-    .meta-line {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 6px;
-    }
-    .badge {
-      display: inline-flex;
-      gap: 8px;
-      align-items: center;
-      padding: 10px 14px;
-      border-radius: 14px;
-      background: rgba(45, 212, 191, 0.12);
-      color: #99f6e4;
-      border: 1px solid rgba(45,212,191,0.3);
-      font-weight: 600;
-      font-size: 13px;
-    }
-    .badge.secondary {
-      background: rgba(148, 163, 184, 0.1);
-      color: #e2e8f0;
-      border-color: rgba(148, 163, 184, 0.2);
-    }
-    .badge svg { height: 16px; width: 16px; }
-    .meta-pill {
+    .meta { color: #cbd5e1; margin: 6px 0 0; font-size: 16px; }
+    .pill {
       display: inline-flex;
       align-items: center;
       gap: 8px;
       padding: 8px 12px;
-      margin-bottom: 14px;
+      margin: 8px 0;
       border-radius: 12px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(103, 232, 249, 0.08);
       color: #a5f3fc;
+      border: 1px solid rgba(103, 232, 249, 0.3);
       font-weight: 600;
       font-size: 13px;
+    }
+    article {
+      margin-top: 18px;
+      padding: 22px 20px 24px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
     }
     pre {
       white-space: pre-wrap;
@@ -194,67 +141,29 @@ export const GET: APIRoute = async ({ params, locals }) => {
       margin: 0;
       color: #e2e8f0;
     }
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      margin-bottom: 14px;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.05);
-      color: #e2e8f0;
-      text-decoration: none;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      transition: transform 120ms ease, border-color 120ms ease;
-    }
-    .back-link:hover { transform: translateX(-2px); border-color: rgba(103, 232, 249, 0.6); }
-    .back-link svg { height: 16px; width: 16px; }
+    .subtle { color: #94a3b8; font-size: 14px; margin-top: 6px; }
     @media (max-width: 640px) {
-      .card { padding: 22px 18px; }
-      .shell { padding-top: 34px; }
-      .meta-line { gap: 8px; }
-      .badge { width: 100%; justify-content: center; }
-    }
-    @keyframes floaty {
-      0% { transform: translateY(0px); opacity: 0.9; }
-      100% { transform: translateY(12px); opacity: 0.75; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .glow { animation: none; }
-      .back-link { transition: none; }
+      main { padding: 26px 14px 56px; }
+      article { padding: 18px 16px; }
     }
   </style>
   <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
 </head>
 <body>
-  <div class="glow" aria-hidden="true"></div>
-  <main class="shell">
-    <a href="/" class="back-link" aria-label="Kembali ke halaman pencarian">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6" /><path d="M9 12h12" /></svg>
-      <span>Kembali ke pencarian</span>
+  <main>
+    <a class="back" href="/" aria-label="Kembali ke pencarian">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" height="16" width="16"><path d="M15 18l-6-6 6-6" /><path d="M9 12h12" /></svg>
+      Kembali
     </a>
 
-    <header class="hero">
-      <span class="eyebrow"><span class="eyebrow-dot"></span> Lirik Lagu Rohani · ${languageText.toUpperCase()}</span>
+    <header>
+      <div class="pill">Bahasa ${languageText.toUpperCase()}</div>
       <h1>${titleText}</h1>
-      ${artistText ? `<p class="artist">oleh ${artistText}</p>` : ''}
-      <div class="meta-line">
-        <span class="badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l3 3" /></svg>
-          Edge render
-        </span>
-        <span class="badge secondary">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
-          Diupdate ${updatedHuman}
-        </span>
-      </div>
+      ${artistText ? `<p class="meta">${artistText}</p>` : ''}
+      <p class="subtle">Diperbarui ${updatedHuman}</p>
     </header>
 
-    <article class="card">
-      <div class="meta-pill">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6" /></svg>
-        Bahasa ${languageText.toUpperCase()} · Simpan untuk offline? gunakan simpan halaman.
-      </div>
+    <article>
       <pre>${bodyText || 'Lirik belum tersedia.'}</pre>
     </article>
   </main>
