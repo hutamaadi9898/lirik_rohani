@@ -22,9 +22,7 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
 
   if (needsAuth) {
     const expected = context.locals.runtime?.env?.ADMIN_TOKEN;
-    if (!expected) {
-      return applySecurityHeaders(new Response('Server misconfigured', { status: 500 }));
-    }
+    if (!expected) return applySecurityHeaders(new Response('Unauthorized', { status: 401 }));
     const bearer = readBearer(context.request);
     const cookieToken = context.cookies.get('admin_token')?.value;
     const token = bearer || cookieToken;

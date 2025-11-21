@@ -12,14 +12,10 @@ const respond = (obj: unknown, status = 200, extraHeaders: Record<string, string
 export const POST: APIRoute = async ({ locals, request }) => {
   const env = locals.runtime?.env as Env;
   const expected = env.ADMIN_TOKEN;
-  if (!expected) return respond({ ok: false, error: 'Admin token not configured' }, 500);
+  if (!expected) return respond({ ok: false, error: 'Admin token not configured' }, 401);
 
-  const body = (await request.json().catch(() => null)) as { token?: string } | null;
-  const provided = (body?.token ?? '').trim() || readBearer(request);
-
-  if (!provided || provided !== expected) {
-    return respond({ ok: false, error: 'Unauthorized' }, 401);
-  }
+  const provided = readBearer(request);
+  if (!provided || provided !== expected) return respond({ ok: false, error: 'Unauthorized' }, 401);
 
   const maxAgeSeconds = 60 * 60 * 12;
   const secure = import.meta.env.PROD;

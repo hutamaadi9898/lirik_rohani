@@ -6,3 +6,4 @@
 - Phase 1 start: Added token-protected middleware, admin UI island with CRUD and refresh, admin API with audit logging to KV, unified D1 prod/preview binding in wrangler.jsonc, added AUDIT_LOG binding and ADMIN_TOKEN env typings.
 2025-11-21
 - Fixed admin token login flow (new session endpoint + HttpOnly cookie) and removed query tokens; tightened middleware with security headers and strict auth; added credentialed fetches in AdminIsland; hardened admin API auth and CORS/no-store caching.
+- Adjusted session to accept Authorization header only (no token in request body), downgraded missing-secret responses to 401 to avoid 500s.

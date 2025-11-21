@@ -46,11 +46,9 @@ export default function AdminIsland() {
     const res = await fetch('/api/admin/session', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         ...(headers ?? {}),
       },
       credentials: 'same-origin',
-      body: JSON.stringify({ token }),
     });
     if (!res.ok) {
       setAuthed(false);
