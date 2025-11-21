@@ -13,9 +13,9 @@
 	"d1_databases": [
 		{
 			"binding": "LYRICS_DB",
-			"database_name": "lyrics-prod",
-			"database_id": "YOUR_D1_DB_ID",
-			"preview_database_id": "YOUR_D1_DB_ID",
+			"database_name": "lyrics-dev",
+			"database_id": "b10f59cc-23a5-4048-b24f-504e3109f621",
+			"preview_database_id": "b10f59cc-23a5-4048-b24f-504e3109f621",
 			"migrations_dir": "drizzle/migrations",
 			"remote": true
 		}
@@ -23,13 +23,13 @@
 	"kv_namespaces": [
 		{
 			"binding": "LYRICS_CACHE",
-			"id": "REPLACE_WITH_PROD_KV_ID",
-			"preview_id": "REPLACE_WITH_DEV_KV_ID"
+			"id": "77159a4aa5e24ed4b00a74f06b52e029",
+			"preview_id": "77159a4aa5e24ed4b00a74f06b52e029"
 		},
 		{
 			"binding": "AUDIT_LOG",
-			"id": "REPLACE_WITH_PROD_AUDIT_KV_ID",
-			"preview_id": "REPLACE_WITH_DEV_AUDIT_KV_ID"
+			"id": "77159a4aa5e24ed4b00a74f06b52e029",
+			"preview_id": "77159a4aa5e24ed4b00a74f06b52e029"
 		}
 	],
 	"observability": {
