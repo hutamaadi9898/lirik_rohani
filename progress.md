@@ -17,3 +17,5 @@
 - Added detailed DB error mapping (surface "Database not migrated" and include detail) for admin songs CRUD to pinpoint remaining server errors.
 2025-11-21
 - Fixed song detail rendering to handle non-string bodies without showing “[object Object]”; search now auto-runs as you type (debounced) and guards snippet rendering.
+2025-11-21
+- Sanitized search API snippets to strings to prevent “[object Object]”; added `role=\"search\"` accessibility to form.

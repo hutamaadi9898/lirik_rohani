@@ -85,7 +85,7 @@ export function SearchIsland({ initialQuery = '' }: Props) {
 
   return (
     <div className="space-y-6">
-      <form onSubmit={handleSubmit} className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow-lg shadow-cyan-500/5">
+      <form onSubmit={handleSubmit} className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 shadow-lg shadow-cyan-500/5" role="search">
         <label htmlFor="q" className="block text-sm font-medium text-slate-300">
           Cari lirik
         </label>

@@ -50,7 +50,13 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
   const { results } = await statement.all();
 
-  const payload = { results: results ?? [] };
+  // Ensure snippet is string to avoid rendering [object Object]
+  const safeResults = (results ?? []).map((row) => ({
+    ...row,
+    snippet: typeof row.snippet === 'string' ? row.snippet : '',
+  }));
+
+  const payload = { results: safeResults };
 
   if (env.LYRICS_CACHE) {
     await env.LYRICS_CACHE.put(cacheKey, JSON.stringify(payload), { expirationTtl: 300 });
