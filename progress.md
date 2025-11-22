@@ -85,3 +85,7 @@
 - Updated homepage: local bible hero image + logo, simplified copy, title now “Lirik Lagu Rohani”; build ✅.
 2025-11-22
 - Fixed hero/logo rendering (use Astro asset src/width/height); rebuild ready for deploy.
+2025-11-22
+- Replaced logo + favicon with minimalist LR monogram (dark/light aware); build ✅.
+2025-11-22
+- Optimized hero image with astro:assets (avif/webp responsive, eager + high fetchpriority) to cut LCP bytes; build ✅.
