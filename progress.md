@@ -63,3 +63,5 @@
 - Removed `onSchedule` cron handler from `/api/warm-cache` (Pages doesn't support cron); warmer now manual-only and plan updated accordingly.
 2025-11-22
 - Investigated prod issue: stats/search not loading; root cause is missing Pages bindings/functions (LYRICS_DB/KV) — advised to link bindings and re-enable Pages Functions.
+2025-11-22
+- Pointed Astro session storage at existing `LYRICS_CACHE` binding to remove missing `SESSION` errors that were crashing API routes and blocking stats/search on Pages.

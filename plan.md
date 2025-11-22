@@ -37,6 +37,7 @@ Goal: Ship lirikrohani.com as a fast, minimalist Astro 5.16 app for Indonesian w
 - [x] Audit log to KV (append-only) for admin actions
 - [x] Harden admin token flow (no query tokens, HttpOnly session, security headers)
 - [ ] Better error boundaries + user-facing fallbacks (keep `/api` and pages from blank states)
+- [x] Point Astro session storage to existing KV binding so missing `SESSION` never crashes API routes
 - [x] P99 latency SLO (<75ms warm) measured and logged
 - [x] Add automated DB health check (migrations applied, bindings present) surfaced in `/api/health`
 - [x] Background KV cache warmer endpoint; cron scheduling unsupported on Pages (manual trigger only)

@@ -16,6 +16,11 @@ export default defineConfig({
       },
     },
     imageService: 'cloudflare',
+    // Use existing KV binding for Astro sessions so the Worker doesn't require
+    // an extra `SESSION` namespace. Without this, Cloudflare will crash the
+    // runtime with “Invalid binding `SESSION`”, which breaks /api/stats and
+    // /api/search in production.
+    sessionKVBindingName: 'LYRICS_CACHE',
   }),
   integrations: [
     react({
