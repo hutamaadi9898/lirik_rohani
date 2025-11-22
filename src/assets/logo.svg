@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 60" width="300" height="60">
+  <g fill="#333333">
+    <ellipse cx="20" cy="45" rx="8" ry="6" transform="rotate(-20 20 45)"/>
+    <rect x="24" y="5" width="4" height="45"/>
+    <rect x="16" y="18" width="20" height="4"/>
+  </g>
+  
+  <text x="55" y="40" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="300" font-size="24" fill="#333333" letter-spacing="1">
+    lirik<tspan font-weight="600">rohani</tspan>.com
+  </text>
+</svg>

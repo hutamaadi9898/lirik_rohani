@@ -2,45 +2,39 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SearchIsland from '../components/SearchIsland';
 import StatsIsland from '../components/StatsIsland';
+import bibleImg from '../assets/bible.webp';
+import logo from '../assets/logo.svg';
 ---
-
-<BaseLayout title="Lirik Rohani Cepat" description="Cari lirik lagu rohani Indonesia dengan FTS5 super cepat di Cloudflare.">
+<BaseLayout title="Lirik Lagu Rohani" description="Cari lirik lagu rohani Indonesia dengan FTS5 super cepat di Cloudflare.">
   <section class="space-y-10">
     <div class="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 px-6 py-10 shadow-2xl sm:px-10 sm:py-12">
       <div class="pointer-events-none absolute -left-32 top-[-120px] h-96 w-96 rounded-full bg-cyan-400/10 blur-3xl" aria-hidden="true" />
       <div class="pointer-events-none absolute -right-24 bottom-[-180px] h-[520px] w-[520px] rounded-full bg-sky-500/10 blur-3xl" aria-hidden="true" />
       <div class="grid items-center gap-10 lg:grid-cols-[1.05fr,0.95fr]">
         <div class="space-y-6">
-          <p class="inline-flex items-center gap-2 rounded-full border border-cyan-200/20 bg-cyan-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-cyan-100 shadow-sm">Lagu untuk jemaat</p>
+          <div class="flex items-center gap-3 text-cyan-100">
+            <img src={logo} alt="Lirik Rohani" class="h-9 w-9 rounded-xl border border-white/10 bg-white/5 p-1" loading="lazy" decoding="async" />
+            <p class="inline-flex items-center gap-2 rounded-full border border-cyan-200/20 bg-cyan-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-cyan-100 shadow-sm">Lagu untuk jemaat</p>
+          </div>
           <div class="space-y-4">
             <h1 class="text-4xl font-semibold leading-tight text-white sm:text-5xl">
               Cari lirik pujian & penyembahan berbahasa Indonesia.
             </h1>
             <p class="max-w-3xl text-base text-slate-200 sm:text-lg">
-              Untuk WL, singer, pemain musik, dan jemaat yang mau menyiapkan ibadah. Tinggal ketik judul atau potongan lirik, kami tampilkan lirik lengkap seketika.
-              Koleksi kurasi gereja-gereja Indonesia, tanpa iklan dan aman dibuka di proyektor gereja.
+              Untuk WL, singer, pemain musik, dan jemaat yang menyiapkan ibadah mingguan. Ketik judul atau potongan lirik, kami tampilkan teks lengkap seketika. Rapi dibaca di ponsel maupun layar proyektor.
             </p>
-          </div>
-          <div class="flex flex-wrap gap-3 text-sm text-slate-200">
-            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">🔥 900+ lagu rohani</span>
-            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">Bahasa Indonesia & Inggris</span>
-            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">FTS5 super cepat</span>
-            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">Tanpa iklan</span>
           </div>
         </div>
 
         <div class="relative">
           <div class="aspect-[4/3] overflow-hidden rounded-2xl border border-white/10 bg-slate-900/60 shadow-2xl backdrop-blur">
-            <picture>
-              <source srcset="https://images.pexels.com/photos/1112048/pexels-photo-1112048.jpeg?auto=compress&cs=tinysrgb&w=1280&dpr=2" media="(min-width: 900px)" />
-              <img
-                src="https://images.pexels.com/photos/1112048/pexels-photo-1112048.jpeg?auto=compress&cs=tinysrgb&w=900&h=600&dpr=1"
-                alt="Jemaat beribadah dengan tangan terangkat"
-                loading="lazy"
-                decoding="async"
-                class="h-full w-full object-cover"
-              />
-            </picture>
+            <img
+              src={bibleImg}
+              alt="Alkitab terbuka untuk persiapan ibadah"
+              loading="lazy"
+              decoding="async"
+              class="h-full w-full object-cover"
+            />
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/10 to-transparent" aria-hidden="true"></div>
           </div>
           <div class="absolute -left-6 -bottom-6 hidden min-w-[220px] rounded-2xl border border-white/10 bg-slate-950/85 px-4 py-3 text-sm text-slate-100 shadow-xl backdrop-blur sm:block">
