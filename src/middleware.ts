@@ -46,6 +46,9 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   const url = new URL(context.request.url);
   const debugVersion = 'song-debug-2025-11-21-6';
   const env = context.locals.runtime?.env as Env | undefined;
+  const host = url.hostname.toLowerCase();
+  const isProdHost = host === 'lirikrohani.com' || host === 'www.lirikrohani.com';
+  const isAdminPath = url.pathname.startsWith('/admin');
   const redirectMap = {
     ...baseRedirectMap,
     ...parseMap(context.locals.runtime?.env?.REDIRECT_MAP_JSON as string | undefined),
@@ -81,6 +84,8 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     clone.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
     clone.headers.set('Cross-Origin-Resource-Policy', 'same-origin');
     clone.headers.set('X-Debug-Version', debugVersion);
+    const shouldNoIndex = isAdminPath || !isProdHost || response.status === 404 || response.status === 410;
+    clone.headers.set('X-Robots-Tag', shouldNoIndex ? 'noindex, nofollow' : 'index, follow');
     if (import.meta.env.PROD) {
       clone.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
     }

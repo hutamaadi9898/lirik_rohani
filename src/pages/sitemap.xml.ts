@@ -5,9 +5,7 @@ type Env = { LYRICS_DB?: D1Database };
 export async function GET({ locals }: { locals: any }) {
   const env = locals.runtime?.env as Env | undefined;
   const site = (process.env.SITE_URL ?? 'https://lirikrohani.com').replace(/\/$/, '');
-  const origin = locals.runtime?.request?.url
-    ? new URL(locals.runtime.request.url).origin
-    : site;
+  const origin = site;
 
   let rows:
     | { slug: string; updated_at: number | null }[]
@@ -41,6 +39,9 @@ ${urls
 
   return new Response(xml, {
     status: 200,
-    headers: { 'Content-Type': 'application/xml' },
+    headers: {
+      'Content-Type': 'application/xml; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
+    },
   });
 }

@@ -21,13 +21,52 @@ const normalizeBody = (value: unknown): string => {
   return String(value);
 };
 
+const renderNotFound = (requestUrl: string, message: string) => {
+  const origin = (process.env.SITE_URL ?? new URL(requestUrl).origin).replace(/\/$/, '');
+  const html = `<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Halaman tidak ditemukan — Lirik Rohani</title>
+  <meta name="description" content="${message}">
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="canonical" href="${origin}/404" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <meta name="theme-color" content="#0b1224" />
+  <style>
+    body { margin:0; background:#070b11; color:#e2e8f0; font-family:'Space Grotesk','Inter',system-ui,sans-serif; display:flex; align-items:center; justify-content:center; min-height:100vh; }
+    .card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:28px 24px; box-shadow:0 20px 60px rgba(0,0,0,0.35); max-width:520px; text-align:center; }
+    h1 { margin:0 0 10px; font-size:28px; }
+    p { margin:0 0 14px; color:#cbd5e1; }
+    a { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 16px; border-radius:12px; background:#67e8f9; color:#0f172a; font-weight:700; text-decoration:none; border:1px solid rgba(103,232,249,0.6); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <p class="pill">404</p>
+    <h1>Halaman tidak ditemukan</h1>
+    <p>${message}</p>
+    <a href="${origin}/">Kembali ke beranda</a>
+  </div>
+</body>
+</html>`;
+  return new Response(html, {
+    status: 404,
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': 'public, max-age=300, stale-while-revalidate=3600',
+    },
+  });
+};
+
 export const GET: APIRoute = async ({ params, locals, request }) => {
   const slug = params.slug ?? '';
   const env = (locals.runtime?.env ?? {}) as Env;
 
   if (!env.LYRICS_DB) {
-    const location = new URL('/404', request.url).toString();
-    return Response.redirect(location, 302);
+    return renderNotFound(request.url, 'Database tidak tersedia');
   }
 
   let row;
@@ -42,13 +81,11 @@ export const GET: APIRoute = async ({ params, locals, request }) => {
       .first();
   } catch (err) {
     console.error('Song query failed', err);
-    const location = new URL('/404', request.url).toString();
-    return Response.redirect(location, 302);
+    return renderNotFound(request.url, 'Gagal memuat lagu');
   }
 
   if (!row) {
-    const location = new URL('/404', request.url).toString();
-    return Response.redirect(location, 302);
+    return renderNotFound(request.url, 'Lagu tidak ditemukan');
   }
 
   const titleText = typeof row.title === 'string' ? row.title : String(row.title ?? '');
@@ -69,7 +106,10 @@ export const GET: APIRoute = async ({ params, locals, request }) => {
     }
   }
   const requestUrl = new URL(request.url);
-  const canonicalUrl = `${requestUrl.origin}/song/${slug}`;
+  const siteOrigin = (process.env.SITE_URL ?? requestUrl.origin).replace(/\/$/, '');
+  const canonicalUrl = `${siteOrigin}/song/${slug}`;
+  const ogImage = `${siteOrigin}/og-default.png`;
+  const robots = 'index, follow';
   const updatedHuman = new Date(Number(row.updated_at ?? row.created_at ?? 0) * 1000).toLocaleDateString('id-ID', {
     day: '2-digit',
     month: 'short',
@@ -85,6 +125,7 @@ export const GET: APIRoute = async ({ params, locals, request }) => {
     url: canonicalUrl,
     datePublished: new Date(Number(row.created_at ?? 0) * 1000).toISOString(),
     dateModified: new Date(Number(row.updated_at ?? row.created_at ?? 0) * 1000).toISOString(),
+    keywords: [titleText, artistText].filter(Boolean).join(', '),
   };
 
   const breadcrumbLd = {
@@ -95,7 +136,7 @@ export const GET: APIRoute = async ({ params, locals, request }) => {
         '@type': 'ListItem',
         position: 1,
         name: 'Beranda',
-        item: `${requestUrl.origin}/`,
+        item: `${siteOrigin}/`,
       },
       {
         '@type': 'ListItem',
@@ -113,15 +154,21 @@ export const GET: APIRoute = async ({ params, locals, request }) => {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${titleText} — Lirik Rohani</title>
   <meta name="description" content="${artistText ? `Lirik \"${titleText}\" oleh ${artistText}` : `Lirik \"${titleText}\"`}">
+  <meta name="robots" content="${robots}" />
+  <meta name="theme-color" content="#0b1224" />
   <meta property="og:title" content="${titleText} — Lirik Rohani" />
   <meta property="og:description" content="${artistText ? `Lirik \"${titleText}\" oleh ${artistText}` : `Lirik \"${titleText}\"`}" />
-  <meta property="og:type" content="website" />
+  <meta property="og:type" content="music.song" />
   <meta property="og:url" content="${canonicalUrl}" />
+  <meta property="og:image" content="${ogImage}" />
+  <meta property="og:site_name" content="Lirik Rohani" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${titleText} — Lirik Rohani" />
+  <meta name="twitter:description" content="${artistText ? `Lirik \"${titleText}\" oleh ${artistText}` : `Lirik \"${titleText}\"`}" />
+  <meta name="twitter:image" content="${ogImage}" />
   <link rel="canonical" href="${canonicalUrl}" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <style>
     :root { color-scheme: dark; }
     * { box-sizing: border-box; }

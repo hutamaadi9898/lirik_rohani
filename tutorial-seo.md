@@ -1,64 +1,89 @@
 # SEO & Discoverability Playbook (LirikRohani.com)
 
-A practical, atomic checklist to keep the site search-friendly on Google, Bing, and AI-powered experiences.
+Atomic, implementation-ready checklist for Astro + Cloudflare Pages/Workers. Use it before every deploy and during weekly QA.
 
 ## 0) One-time setup
 - [ ] Set `SITE_URL=https://lirikrohani.com` in hosting env vars; confirm `astro.config.mjs` `site` matches.
-- [ ] Turn on HTTPS + HSTS (include subdomains) in Cloudflare.
-- [ ] Verify domain property in Google Search Console and Bing Webmaster Tools (DNS TXT). Add sitemap URL.
-- [ ] Add `www → apex` and `http → https` 301 rules in Cloudflare.
+- [ ] Enable HTTPS + HSTS (include subdomains, preload) in Cloudflare → Security > HTTP Strict Transport Security.
+- [ ] Verify domain property (TXT) in Google Search Console + Bing Webmaster; submit sitemap URL.
+- [ ] Add `www → apex` and `http → https` 301 rules in Cloudflare Rules; test with `curl -I http://www.lirikrohani.com`.
 - [ ] Disable/relax Bot Fight/Managed Challenge for main site paths to avoid blocking crawlers.
+- [ ] Default HTML `lang="id"` + `charset="utf-8"`; staging/protected envs behind basic auth + `x-robots-tag: noindex` header.
 
 ## 1) Crawlability
-- [ ] Keep `robots.txt` allowing `/` and pointing to `https://lirikrohani.com/sitemap.xml`.
-- [ ] Ensure `_routes.json` routes unknown paths to the worker so 404 page returns proper 404 status.
-- [ ] Avoid soft-404 redirects; missing pages should return status 404 with helpful HTML.
-- [ ] Remove `noindex` from public pages; keep `noindex` only for `/admin` if needed via header/rules.
+- [ ] `robots.txt` allows `/` and points to `https://lirikrohani.com/sitemap.xml`; keep JS/CSS allowed.
+- [ ] `_routes.json` funnels unknown paths to worker so 404 page returns real 404 status (no soft redirects).
+- [ ] Use 410 for deleted lyrics; avoid redirecting 404s to home.
+- [ ] Public pages stay `index,follow`; only `/admin` and staging use `noindex` via headers.
+- [ ] Quick check (replace SLUG):
+  ```bash
+  curl -I https://lirikrohani.com/
+  curl -I https://lirikrohani.com/song/SLUG
+  curl -I https://lirikrohani.com/robots.txt
+  curl -I https://lirikrohani.com/sitemap.xml
+  ```
 
 ## 2) Sitemaps
-- [ ] `/sitemap.xml` must list homepage + latest 500 songs; confirm lastmod timestamps populate.
-- [ ] After each content update, ping: `https://www.google.com/ping?sitemap=https://lirikrohani.com/sitemap.xml` (or let Search Console recrawl).
-- [ ] Keep sitemap size <50k URLs; if content grows, split per language and add sitemap index.
+- [ ] `/sitemap.xml` lists homepage + latest 500 songs with `<lastmod>` ISO-8601 from `updated_at`.
+- [ ] URLs are absolute HTTPS, match canonical slugs, exclude admin/noindex routes.
+- [ ] After each content publish, ping Google: `curl https://www.google.com/ping?sitemap=https://lirikrohani.com/sitemap.xml`.
+- [ ] If >50k URLs, split per language and add sitemap index.
+- [ ] Validate: `npx sitemap-validator https://lirikrohani.com/sitemap.xml` (optional dev tool).
 
 ## 3) Metadata & structured data
-- [ ] Each page has `<title>` (brand + intent) and `<meta name="description">` summarizing content in Bahasa.
-- [ ] Home page includes JSON-LD `WebSite` + `SearchAction` (already added).
-- [ ] Song pages include `MusicRecording` schema (already present) with `byArtist`, `inLanguage`, `datePublished/Modified`.
-- [ ] Add `BreadcrumbList` JSON-LD on song pages (already present).
-- [ ] Use canonical URLs on every page (`astro.config site` + BaseLayout canonical).
-- [ ] Add `og:title`, `og:description`, `og:type`, `og:url`, `twitter:card=summary_large_image` (already in BaseLayout). Plan: add OG image generation later.
+- [ ] Every page: `<title>` (intent + brand) + `<meta name="description">` in Bahasa; `<html lang="id">`.
+- [ ] Canonical tag on all templates (BaseLayout) derived from `astro.config.site` + pathname.
+- [ ] Home: JSON-LD `WebSite` + `SearchAction` (kept up to date with live domain).
+- [ ] Song pages: `MusicRecording` JSON-LD with `name`, `byArtist`, `inLanguage`, `datePublished`, `dateModified`, `keywords` (chorus terms), plus `BreadcrumbList`.
+- [ ] Open Graph/Twitter: `og:title`, `og:description`, `og:type`, `og:url`, `twitter:card=summary_large_image`.
+- [ ] Fallback `og:image`/`twitter:image` 1200x630 WebP/PNG <512KB stored in `public/og-default.webp`; set `theme-color` and touch icons.
+- [ ] Admin/staging: add `x-robots-tag: noindex, nofollow` via Cloudflare rule or route guard.
+- [ ] Spot-check rendered head:
+  ```bash
+  curl -s https://lirikrohani.com/song/SLUG | sed -n '1,80p'
+  ```
 
 ## 4) Performance (affects SEO)
-- [ ] LCP image: preload or set `fetchpriority="high"`; serve in modern formats (WebP/AVIF) and right dimensions.
-- [ ] Turn on Cloudflare caching with stale-while-revalidate; keep APIs cacheable where safe.
-- [ ] Minify HTML/JS/CSS (Astro does); avoid unnecessary client JS—keep islands lean.
-- [ ] Measure Core Web Vitals via PageSpeed Insights; aim LCP <1.8s, CLS <0.1, TBT <150ms.
+- [ ] LCP image: preload or `fetchpriority="high"`; serve AVIF/WebP in correct sizes (Astro assets).
+- [ ] Fonts: self-host, `preconnect` to font origin, `font-display: swap`; cap weights to used styles.
+- [ ] Cloudflare: caching with `stale-while-revalidate`; edge cache static assets; keep API responses short-lived but cacheable.
+- [ ] Client JS: keep islands minimal; no blocking third-party scripts; defer analytics.
+- [ ] Tailwind purge/treeshake CSS; lazy-load non-critical images.
+- [ ] Targets (mobile 4G): LCP <1.8s, CLS <0.1, TBT <150ms. Recheck via PSI/Lighthouse after UI changes.
 
 ## 5) Content quality
-- [ ] Ensure each lyric page has unique title, artist, clean formatting; avoid duplicates.
-- [ ] Add short intro/context per song (optional) to improve relevance.
-- [ ] Provide internal links: from search results & "Terbaru" list to song pages; consider related songs section.
-- [ ] Keep Bahasa-first copy; include English titles where relevant.
+- [ ] Unique title/artist/slug per lyric; clean stanza formatting (line breaks preserved).
+- [ ] Optional 1–2 sentence intro/context per song to improve relevance.
+- [ ] Internal links: search results → songs; "Terbaru" list; consider related songs by artist/theme.
+- [ ] Bahasa-first copy; include English title in metadata when relevant.
+- [ ] Alt text on hero/OG images; avoid keyword stuffing—mention key chorus terms once naturally.
+- [ ] Maintain About/Contact page for E-E-A-T; include editor credit and update cadence.
+- [ ] QA sample pages monthly for typos/duplicate verses.
 
 ## 6) Logs & monitoring
 - [ ] Track search errors/5xx via Cloudflare Logs; alert if spike >1%.
-- [ ] Re-run Lighthouse weekly; record LCP/CLS/TBT and act on regressions.
-- [ ] Monitor Search Console for coverage errors (404, soft 404, blocked by robots).
+- [ ] Re-run Lighthouse weekly; log LCP/CLS/TBT and fix regressions.
+- [ ] Monitor Search Console: coverage (404/soft 404/blocked), enhancements, Core Web Vitals.
+- [ ] Uptime ping + synthetic: fetch `/song/SLUG`, assert non-empty lyrics + 200 status; alert on failures.
+- [ ] Tail KV cache hit rate and D1 latency; keep P99 <75ms warm.
 
 ## 7) AI/LLM friendliness
-- [ ] Ensure `robots.txt` allows crawl (no AI-specific blocks) unless policy changes.
-- [ ] Keep pages lightweight, structured HTML; avoid heavy JS gating content.
-- [ ] JSON-LD + clean semantic headings (`h1` for title, `h2` sections) for easy parsing.
-- [ ] Provide sitemap and open access (no paywall) so AI crawlers can ingest.
+- [ ] `robots.txt` allows crawl (no AI-specific disallow) unless policy changes.
+- [ ] Keep content server-rendered HTML; avoid JS gating or text-in-images.
+- [ ] Semantic headings (`h1` song title, `h2` sections), ordered verses, ARIA landmarks.
+- [ ] JSON-LD present; sitemap accessible without auth.
+- [ ] No copy-protection overlays; lyrics remain selectable plain text.
 
 ## 8) Deployment checklist
-- [ ] Run `npm run build` locally; confirm no 404 assets in `dist`.
-- [ ] Deploy to Cloudflare Pages; purge cache for `/`, `/sitemap.xml`, `/robots.txt`, and `/hero-bible.webp`.
-- [ ] Hit `/api/health` and a sample search `/api/search?q=kasih` to ensure bindings work.
-- [ ] Manually test 404 (`/tidak-ada`) returns custom page with status 404.
+- [ ] Run `npm run build`; ensure `dist/` has no missing assets.
+- [ ] Deploy to Cloudflare Pages; purge `/`, `/sitemap.xml`, `/robots.txt`, hero/OG assets.
+- [ ] Verify bindings on prod: `/api/health`, `/api/search?q=kasih`, `/api/stats`.
+- [ ] Manually hit a missing path (`/tidak-ada`) → custom 404 with 404 status (not 200/302).
+- [ ] Re-fetch `/robots.txt` and `/sitemap.xml` post-deploy to confirm canonical host + cache headers.
 
 ## 9) Future enhancements
 - [ ] Dynamic OG images per song (Satori/ResVG in Worker) once stable.
 - [ ] Add `hreflang` if English corpus grows; split sitemaps by locale.
 - [ ] Add `manifest.webmanifest` + icons for PWA hints.
-- [ ] Add structured FAQ for top search queries (create `/faq` page with FAQPage schema).
+- [ ] Add structured FAQ for top search queries (FAQPage schema on `/faq`).
+- [ ] Add `web-vitals` client logger feeding KV/Analytics for real-user CWV data.

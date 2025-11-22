@@ -97,3 +97,9 @@
 - Added WebSite/SearchAction JSON-LD on homepage + wrote `tutorial-seo.md` SEO playbook; build ✅.
 2025-11-22
 - Sitemap now falls back to SITE_URL (lirikrohani.com) instead of example.com when no request origin; build ✅.
+2025-11-22
+- Refreshed `tutorial-seo.md` with additional best practices (lang defaults, 410 handling, fonts, alt text, uptime checks) and marked SEO playbook item done in plan.md.
+2025-11-22
+- Expanded `tutorial-seo.md` with implementation-ready checks (curl commands, OG fallback asset, caching/Cloudflare notes, font/JS guidance, monitoring targets) to serve as deploy QA guide.
+2025-11-22
+- Implemented SEO best practices: self-hosted Space Grotesk fonts, canonical/OG defaults with new 1200x630 fallback + apple-touch icon, explicit robots/theme-color meta, stronger robots/sitemap caching + JS/CSS allow, canonical host in sitemap/song pages, 404 for missing songs (no soft redirects), admin noindex headers, and KV/host-aware X-Robots tags.

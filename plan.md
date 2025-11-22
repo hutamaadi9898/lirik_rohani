@@ -67,7 +67,7 @@ Goal: Ship lirikrohani.com as a fast, minimalist Astro 5.16 app for Indonesian w
 
 ## Phase 4 — Performance, SEO, and growth
 - [ ] Dynamic OG image generation per song (Satori/ResVG in Worker) with title/artist branding
-- [ ] Image/OG hygiene: 1200x630 WebP fallback logo + per-song cover if available
+- [x] Image/OG hygiene: 1200x630 WebP fallback logo + per-song cover if available
 - [ ] Security headers: CSP (script/style/img/frame), Referrer-Policy strict-origin-when-cross-origin, X-Content-Type-Options, Permissions-Policy
 - [ ] Core Web Vitals budget: LCP <1.8s, CLS <0.1, TBT <150ms on 4G; add `web-vitals` client logger to KV/Analytics
 - [ ] Analytics + structured logs (Cloudflare Analytics or PostHog) capturing search queries (anonymized) and result clicks
@@ -75,3 +75,4 @@ Goal: Ship lirikrohani.com as a fast, minimalist Astro 5.16 app for Indonesian w
 - [ ] Content ops: slug rules, redirect map, 404/410 handling, and CSV/JSON import validator before writes
 - [ ] Internationalization readiness: hreflang scaffolding if English added; split sitemaps by locale
 - [ ] Monitoring: uptime ping, wrangler tail dashboards, alert on 5xx/search error rate >1%
+- [x] Maintain SEO playbook (`tutorial-seo.md`) with up-to-date best practices
