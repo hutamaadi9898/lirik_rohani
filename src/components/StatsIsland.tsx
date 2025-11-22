@@ -16,7 +16,16 @@ export default function StatsIsland() {
     let cancelled = false;
     const load = async () => {
       try {
-        const res = await fetch('/api/stats');
+        // Avoid 304/conditional responses from CDN that would leave us with no body.
+        const res = await fetch('/api/stats', { cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } });
+        if (res.status === 304) {
+          // Treat as a soft miss; try again without conditional caching.
+          const retry = await fetch('/api/stats', { cache: 'reload', headers: { 'Cache-Control': 'no-cache' } });
+          if (!retry.ok) throw new Error('Gagal memuat data');
+          const json = (await retry.json()) as Stats;
+          if (!cancelled) setStats(json);
+          return;
+        }
         if (!res.ok) throw new Error('Gagal memuat data');
         const json = (await res.json()) as Stats;
         if (!cancelled) setStats(json);

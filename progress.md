@@ -64,4 +64,10 @@
 2025-11-22
 - Investigated prod issue: stats/search not loading; root cause is missing Pages bindings/functions (LYRICS_DB/KV) — advised to link bindings and re-enable Pages Functions.
 2025-11-22
+- Forced `/api/stats` and `/api/search` fetches to bypass CDN/browser caches (no-store + retry) so 304/ETag responses no longer block hydration; rebuild ready to deploy.
+2025-11-22
 - Pointed Astro session storage at existing `LYRICS_CACHE` binding to remove missing `SESSION` errors that were crashing API routes and blocking stats/search on Pages.
+2025-11-22
+- Made SafeIsland instances unique (added name prop) so Astro generates distinct island IDs; fixes duplicate-uid hydration stall that kept stats/search on “Memuat…”.
+2025-11-22
+- Switched islands to `client:load` (from client:only) to force hydration at page load; ensures stats/search React effects fire on Pages even with aggressive caching.

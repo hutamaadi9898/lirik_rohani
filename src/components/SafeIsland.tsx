@@ -1,6 +1,6 @@
 import { Component, type ReactNode } from 'react';
 
-type Props = { children: ReactNode; fallback?: ReactNode };
+type Props = { children: ReactNode; fallback?: ReactNode; name?: string };
 
 type State = { hasError: boolean };
 

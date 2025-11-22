@@ -97,6 +97,8 @@ export function SearchIsland({ initialQuery = '' }: Props) {
         if (opts?.titleOnly) params.set('titleOnly', '1');
         const res = await fetch(`/api/search?${params.toString()}`, {
           signal: nextController.signal,
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache' },
         });
         if (!res.ok) throw new Error('Gagal memuat hasil');
         const json = (await res.json()) as { results?: SearchResult[] };

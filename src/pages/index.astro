@@ -19,11 +19,11 @@ import { SafeIsland } from '../components/SafeIsland';
       </div>
     </div>
 
-    <SafeIsland client:only="react">
+    <SafeIsland client:load name="stats">
       <StatsIsland />
     </SafeIsland>
 
-    <SafeIsland client:only="react">
+    <SafeIsland client:load name="search">
       <SearchIsland />
     </SafeIsland>
   </section>
