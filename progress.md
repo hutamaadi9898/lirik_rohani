@@ -61,3 +61,5 @@
 - Removed unsupported `triggers` block from wrangler.jsonc to fix Pages deploy; cron must be configured via Cloudflare dashboard instead.
 2025-11-22
 - Removed `onSchedule` cron handler from `/api/warm-cache` (Pages doesn't support cron); warmer now manual-only and plan updated accordingly.
+2025-11-22
+- Investigated prod issue: stats/search not loading; root cause is missing Pages bindings/functions (LYRICS_DB/KV) — advised to link bindings and re-enable Pages Functions.
