@@ -1,13 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="Lirik Rohani">
-  <rect x="8" y="8" width="144" height="144" rx="28" fill="#0b1729" stroke="#22d3ee" stroke-width="6" />
-  <path d="M54 46v68h40" fill="none" stroke="#22d3ee" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
-  <path d="M102 114V46h28c14 0 26 11 26 26s-9 24-22 26l22 32" fill="none" stroke="#7dd3fc" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
-  <circle cx="50" cy="110" r="6" fill="#67e8f9" />
-  <circle cx="116" cy="56" r="6" fill="#67e8f9" />
+  <defs>
+    <linearGradient id="lr-g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22d3ee" />
+      <stop offset="100%" stop-color="#0ea5e9" />
+    </linearGradient>
+  </defs>
+  <rect x="10" y="10" width="140" height="140" rx="28" fill="#0b1729" stroke="#0ea5e9" stroke-width="6" />
+  <path d="M54 46v68h32" fill="none" stroke="url(#lr-g)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M98 114V46h24c13 0 24 10 24 24s-7 22-20 24l20 20" fill="none" stroke="#7dd3fc" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="54" cy="110" r="6" fill="#22d3ee" />
+  <circle cx="122" cy="58" r="6" fill="#7dd3fc" />
   <style>
     @media (prefers-color-scheme: light) {
       rect { fill: #e0f2fe; stroke: #0ea5e9; }
-      path, circle { stroke: #0ea5e9; fill: #22c55e; }
+      path { stroke: #0ea5e9; }
       circle { fill: #0ea5e9; }
     }
   </style>

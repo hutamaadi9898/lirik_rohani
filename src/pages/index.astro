@@ -29,18 +29,19 @@ import { Image } from 'astro:assets';
 
         <div class="relative">
           <div class="aspect-[4/3] overflow-hidden rounded-2xl border border-white/10 bg-slate-900/60 shadow-2xl backdrop-blur">
-            <Image
-              src={bibleImg}
-              alt="Alkitab terbuka untuk persiapan ibadah"
-              widths={[640, 960, 1280]}
-              formats={["avif", "webp"]}
-              sizes="(min-width: 1024px) 46vw, 90vw"
-              loading="eager"
-              fetchpriority="high"
-              decoding="async"
-              class="h-full w-full object-cover"
-              fit="cover"
-            />
+            <picture>
+              <source srcset="/hero-bible.webp" type="image/webp" />
+              <img
+                src="/hero-bible.webp"
+                alt="Alkitab terbuka untuk persiapan ibadah"
+                width="900"
+                height="600"
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
+                class="h-full w-full object-cover"
+              />
+            </picture>
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/10 to-transparent" aria-hidden="true"></div>
           </div>
           <div class="absolute -left-6 -bottom-6 hidden min-w-[220px] rounded-2xl border border-white/10 bg-slate-950/85 px-4 py-3 text-sm text-slate-100 shadow-xl backdrop-blur sm:block">
