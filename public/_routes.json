@@ -1,13 +1,6 @@
 {
   "version": 1,
-  "include": [
-    "/_server-islands/*",
-    "/_image",
-    "/api/*",
-    "/sitemap.xml",
-    "/song/*",
-    "/*"
-  ],
+  "include": ["/*"],
   "exclude": [
     "/_astro/*",
     "/favicon.svg",

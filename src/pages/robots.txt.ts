@@ -1,10 +1,12 @@
 export const prerender = true;
 
 export async function GET() {
+  const site = process.env.SITE_URL ?? 'https://lirikrohani.com';
+  const sitemap = `${site.replace(/\/$/, '')}/sitemap.xml`;
   const body = `User-agent: *
 Allow: /
 Disallow: /admin
-Sitemap: /sitemap.xml
+Sitemap: ${sitemap}
 `;
   return new Response(body, {
     status: 200,
