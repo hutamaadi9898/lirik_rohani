@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Loader2, Search } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { Component, useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 
 type SearchResult = {
   id: string;
@@ -30,7 +30,7 @@ const baseFade = {
   animate: { opacity: 1, y: 0 },
 };
 
-export function SearchIsland({ initialQuery = '' }: Props) {
+function SearchContent({ initialQuery = '' }: Props) {
   const prefersReducedMotion = useReducedMotion();
   const [query, setQuery] = useState(initialQuery);
   const [lang, setLang] = useState<'all' | 'id' | 'en'>('all');
@@ -300,4 +300,30 @@ export function SearchIsland({ initialQuery = '' }: Props) {
   );
 }
 
-export default SearchIsland;
+class ErrorBoundary extends Component<{ children: React.ReactNode }, { hasError: boolean }> {
+  state = { hasError: false };
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(err: unknown) {
+    console.error('SearchIsland error', err);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-50">
+          Gagal memuat pencarian. Muat ulang halaman dan coba lagi.
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+export default function SearchIsland(props: Props) {
+  return (
+    <ErrorBoundary>
+      <SearchContent {...props} />
+    </ErrorBoundary>
+  );
+}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Component, useEffect, useState } from 'react';
 import { Clock3, Music, Sparkles } from 'lucide-react';
 
 type Latest = { slug: string; title: string; artist: string | null; updated_at: number | null };
@@ -8,7 +8,7 @@ type Stats = {
   latest: Latest[];
 };
 
-export default function StatsIsland() {
+function StatsContent() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -80,5 +80,33 @@ export default function StatsIsland() {
         </div>
       </div>
     </div>
+  );
+}
+
+class ErrorBoundary extends Component<{ children: React.ReactNode }, { hasError: boolean }> {
+  state = { hasError: false };
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(err: unknown) {
+    console.error('StatsIsland error', err);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-50">
+          Gagal memuat statistik. Coba muat ulang.
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+export default function StatsIsland() {
+  return (
+    <ErrorBoundary>
+      <StatsContent />
+    </ErrorBoundary>
   );
 }
