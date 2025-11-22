@@ -30,6 +30,15 @@ const canonical = Astro.url?.toString() ?? Astro.site?.href ?? '';
     <ViewTransitions />
   </head>
   <body class="relative min-h-screen font-sans antialiased">
+    <div
+      class="pointer-events-none absolute inset-0 -z-20 opacity-90"
+      style="background-image:radial-gradient(circle at 18% 20%,rgba(45,212,191,0.18),transparent 32%),radial-gradient(circle at 84% 18%,rgba(59,130,246,0.16),transparent 32%),radial-gradient(circle at 70% 78%,rgba(14,165,233,0.14),transparent 36%);"
+      aria-hidden="true"
+    ></div>
+    <div
+      class="pointer-events-none absolute inset-0 -z-30 bg-[url('/hero-mesh.svg')] bg-cover bg-fixed opacity-50"
+      aria-hidden="true"
+    ></div>
     <a href="#search" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-slate-900">Loncat ke pencarian</a>
     <main role="main" class="relative mx-auto flex min-h-screen max-w-4xl flex-col px-4 pb-16 pt-12 sm:px-8">
       <slot />

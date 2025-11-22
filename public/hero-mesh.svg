@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1200" viewBox="0 0 1600 1200" role="img" aria-label="Ambient gradient mesh">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.22" />
+      <stop offset="70%" stop-color="#8b5cf6" stop-opacity="0.12" />
+      <stop offset="100%" stop-color="#0b1220" stop-opacity="0.2" />
+    </linearGradient>
+    <radialGradient id="g2" cx="30%" cy="32%" r="40%">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.35" />
+      <stop offset="60%" stop-color="#0f172a" stop-opacity="0.05" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="g3" cx="78%" cy="20%" r="38%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.28" />
+      <stop offset="65%" stop-color="#0f172a" stop-opacity="0.05" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="g4" cx="70%" cy="82%" r="42%">
+      <stop offset="0%" stop-color="#22c55e" stop-opacity="0.18" />
+      <stop offset="60%" stop-color="#0f172a" stop-opacity="0.05" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="1200" fill="#0b1220" />
+  <rect width="1600" height="1200" fill="url(#g1)" opacity="0.8" />
+  <circle cx="480" cy="360" r="420" fill="url(#g2)" />
+  <circle cx="1220" cy="280" r="360" fill="url(#g3)" />
+  <circle cx="1120" cy="920" r="420" fill="url(#g4)" />
+  <path d="M180 980C340 820 560 880 760 800s480-40 620-240" fill="none" stroke="#38bdf8" stroke-opacity="0.08" stroke-width="96" stroke-linecap="round" />
+  <path d="M220 1030c120-140 320-120 520-180s420-120 620-300" fill="none" stroke="#a855f7" stroke-opacity="0.08" stroke-width="84" stroke-linecap="round" />
+  <g stroke="#cbd5e1" stroke-opacity="0.08" stroke-width="2">
+    <path d="M160 200c120 60 220 40 320 0s220-80 360-40 260 120 360 120 200-40 260-80" fill="none" />
+    <path d="M140 300c140 60 260 40 360 0s220-100 360-60 260 140 360 140 220-40 280-80" fill="none" />
+  </g>
+</svg>

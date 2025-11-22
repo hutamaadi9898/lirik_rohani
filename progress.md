@@ -77,3 +77,5 @@
 - Added custom `public/_routes.json` to route all unknown paths through the worker (with static exclusions), restoring custom 404 handling on Pages for URLs like `/a`.
 2025-11-22
 - Redesigned 404 page with a simple Tailwind card (back-to-home/search CTAs) to fix broken /404 experience.
+2025-11-22
+- Refreshed homepage visuals with gradient mesh background and hero illustration (plus anchor for skip-to-search); build still clean.

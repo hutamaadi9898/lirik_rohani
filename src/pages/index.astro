@@ -5,21 +5,46 @@ import StatsIsland from '../components/StatsIsland';
 ---
 
 <BaseLayout title="Lirik Rohani Cepat" description="Cari lirik lagu rohani Indonesia dengan FTS5 super cepat di Cloudflare.">
-  <section class="space-y-8">
-    <div class="rounded-3xl border border-white/5 bg-white/5 px-6 py-8 shadow-xl sm:px-8 sm:py-10">
-      <div class="space-y-4">
-        <p class="text-xs uppercase tracking-[0.22em] text-cyan-100">Temukan lagu rohani</p>
-        <h1 class="text-4xl font-semibold leading-tight text-white sm:text-5xl">
-          Ketik judul atau potongan lirik. Hasil muncul seketika.
-        </h1>
-        <p class="max-w-3xl text-base text-slate-200 sm:text-lg">
-          Cocok untuk ibadah, latihan, atau mengingat lirik favorit. Tanpa istilah teknis, hanya cari dan temukan.
-        </p>
+  <section class="space-y-10">
+    <div class="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 px-6 py-10 shadow-2xl sm:px-10 sm:py-12">
+      <div class="pointer-events-none absolute -left-32 top-[-120px] h-96 w-96 rounded-full bg-cyan-400/10 blur-3xl" aria-hidden="true" />
+      <div class="pointer-events-none absolute -right-24 bottom-[-180px] h-[520px] w-[520px] rounded-full bg-sky-500/10 blur-3xl" aria-hidden="true" />
+      <div class="grid items-center gap-10 lg:grid-cols-[1.05fr,0.95fr]">
+        <div class="space-y-6">
+          <p class="inline-flex items-center gap-2 rounded-full border border-cyan-200/20 bg-cyan-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-cyan-100 shadow-sm">Temukan lagu rohani</p>
+          <div class="space-y-4">
+            <h1 class="text-4xl font-semibold leading-tight text-white sm:text-5xl">
+              Ketik judul atau potongan lirik. Hasil muncul seketika.
+            </h1>
+            <p class="max-w-3xl text-base text-slate-200 sm:text-lg">
+              Cocok untuk ibadah, latihan, atau mengingat lirik favorit. Tanpa istilah teknis, hanya cari dan temukan.
+              Dibangun di Cloudflare Workers + D1 + FTS5 yang ringan, jadi pencarian tetap cepat bahkan di koneksi lambat.
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-3 text-sm text-slate-200">
+            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">🔥 900+ lagu terkurasi</span>
+            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">FTS5 full-body search</span>
+            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">Bebas iklan & pelacak</span>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div class="aspect-[4/3] overflow-hidden rounded-2xl border border-white/10 bg-slate-900/60 shadow-2xl backdrop-blur">
+            <img src="/hero-chorus.svg" alt="Ilustrasi choir dan lagu rohani" loading="lazy" decoding="async" class="h-full w-full object-cover" />
+          </div>
+          <div class="absolute -left-6 -bottom-6 hidden min-w-[210px] rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 shadow-xl backdrop-blur sm:block">
+            <p class="text-xs uppercase tracking-[0.18em] text-cyan-200">Cepat & ringan</p>
+            <p class="mt-1 text-lg font-semibold">Pencarian <span class="text-cyan-200">&lt; 150ms</span></p>
+            <p class="text-xs text-slate-400">Cache + indeks FTS5 yang dipanaskan otomatis.</p>
+          </div>
+        </div>
       </div>
     </div>
 
     <StatsIsland client:load />
 
-    <SearchIsland client:load />
+    <div id="search">
+      <SearchIsland client:load />
+    </div>
   </section>
 </BaseLayout>
