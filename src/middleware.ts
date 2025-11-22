@@ -161,12 +161,6 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
         }),
       );
     }
-    // Redirect any unknown routes to custom 404 page
-    if (response.status === 404 && url.pathname !== '/404') {
-      const notFound = new URL('/404', url.origin).toString();
-      return applySecurityHeaders(Response.redirect(notFound, 302));
-    }
-
     // Inspect song page responses to catch unexpected bodies.
     if (url.pathname.startsWith('/song/')) {
       try {
