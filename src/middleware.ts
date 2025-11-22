@@ -1,6 +1,12 @@
 import type { MiddlewareHandler } from 'astro';
 import { readBearer } from './lib/adminAuth';
 
+type Env = {
+  LYRICS_DB?: D1Database;
+  LYRICS_CACHE?: KVNamespace;
+  AUDIT_LOG?: KVNamespace;
+};
+
 const PROTECTED_PREFIXES = ['/api/admin'];
 const AUTH_EXEMPT_PATHS = ['/api/admin/session'];
 
@@ -39,7 +45,7 @@ const parseGone = (csv: string | undefined): Set<string> => {
 export const onRequest: MiddlewareHandler = async (context, next) => {
   const url = new URL(context.request.url);
   const debugVersion = 'song-debug-2025-11-21-6';
-  const env = context.locals.runtime?.env as { LYRICS_DB?: D1Database } | undefined;
+  const env = context.locals.runtime?.env as Env | undefined;
   const redirectMap = {
     ...baseRedirectMap,
     ...parseMap(context.locals.runtime?.env?.REDIRECT_MAP_JSON as string | undefined),
@@ -48,6 +54,24 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     ...baseGoneSlugs,
     ...parseGone(context.locals.runtime?.env?.GONE_SLUGS_CSV as string | undefined),
   ]);
+
+  const started = Date.now();
+
+  const bucketLatency = async (ms: number) => {
+    if (!env?.AUDIT_LOG) return;
+    if (Math.random() > 0.05) return; // 5% sample
+    const bucketKey = `metrics:latency:${new Date().toISOString().slice(0, 16)}`; // YYYY-MM-DDTHH:MM
+    const thresholds = [25, 50, 75, 100, 200, 500, 1000, 5000];
+    const label = thresholds.find((t) => ms <= t) ?? 'gt5000';
+    try {
+      const current = await env.AUDIT_LOG.get(bucketKey, 'json');
+      const data: Record<string, number> = current && typeof current === 'object' ? (current as any) : {};
+      data[label] = (data[label] ?? 0) + 1;
+      await env.AUDIT_LOG.put(bucketKey, JSON.stringify(data), { expirationTtl: 60 * 90 });
+    } catch (err) {
+      console.error('Latency bucket write failed', err);
+    }
+  };
 
   const applySecurityHeaders = (response: Response) => {
     const clone = new Response(response.body, response);
@@ -60,6 +84,10 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     if (import.meta.env.PROD) {
       clone.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
     }
+    const duration = Date.now() - started;
+    clone.headers.set('Server-Timing', `app;dur=${duration}`);
+    clone.headers.set('X-Response-Time', `${duration}ms`);
+    bucketLatency(duration);
     return clone;
   };
 

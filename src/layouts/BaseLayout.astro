@@ -1,5 +1,6 @@
 ---
 import '../styles/tailwind.css';
+import { ViewTransitions } from 'astro:transitions';
 
 const { title = 'Lirik Rohani', description = 'Cari lirik lagu rohani Indonesia dengan cepat' } = Astro.props;
 const canonical = Astro.url?.toString() ?? Astro.site?.href ?? '';
@@ -26,8 +27,10 @@ const canonical = Astro.url?.toString() ?? Astro.site?.href ?? '';
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
+    <ViewTransitions />
   </head>
   <body class="relative min-h-screen font-sans antialiased">
+    <a href="#search" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-slate-900">Loncat ke pencarian</a>
     <main role="main" class="relative mx-auto flex min-h-screen max-w-4xl flex-col px-4 pb-16 pt-12 sm:px-8">
       <slot />
     </main>

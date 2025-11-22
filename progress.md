@@ -39,3 +39,21 @@
 2025-11-21 - Expanded redirect map with 410 handling for removed slugs; marked 404/410 item done in SEO plan.
 2025-11-21 - Middleware now redirects unknown routes to custom /404 page to keep UX consistent.
 2025-11-21 - Added stats endpoint + mini dashboard on home, song page view counter via KV, and plan updated for these features.
+2025-11-21 - Hardened song route: fallback redirect to /404 when DB binding is missing or query fails to avoid 500s on bad slugs/preview.
+2025-11-22
+- Rewrote plan.md with atomic phases (foundation, reliability, lirikrohani.com launch, UX/perf) and added modern/minimal UI + SEO/perf tasks.
+- Updated tutorial.md with domain-specific Cloudflare Pages steps for lirikrohani.com (site URL, DNS, redirects, HSTS, smoke checks).
+2025-11-22
+- Added txt-based seeder (`scripts/seed-from-txt.ts`) that parses `lyrics_output (1).txt`, detects language heuristically, writes `seed/parsed-songs.json`, and seeds D1 via wrangler (with DRY_RUN support); wired npm script `db:seed:txt`.
+2025-11-22
+- Ran `npm run db:seed:txt` (local) to load 950 songs into LYRICS_DB; persisted parsed snapshot to seed/parsed-songs.json. Updated astro.config.mjs site to lirikrohani.com and persisted platformProxy state.
+2025-11-22
+- Added remote seeding support (passes --remote when CLOUDFLARE_ENV!=local) and seeded 950 songs into production D1 (LYRICS_DB preview/prod id b10f59cc-23a5-4048-b24f-504e3109f621).
+2025-11-22
+- Fixed seeders to preserve real line breaks (no literal \n stored) and re-seeded both local and production D1 with 950 songs.
+2025-11-22
+- Implemented Phase 1/3 items: search API filters (lang/title-only), suggestion chips + persisted recents, action bar on song page (copy/share/save), enhanced /api/health with table/migration checks, response-time logging with sampled latency buckets, cache warmer endpoint, and set plan checkboxes accordingly.
+2025-11-22
+- Added view transitions + skip link, card title highlighting, reduced-motion guard; created SafeIsland error boundary; wired cron trigger and scheduled warm-cache handler; fixed driver config and typings.
+2025-11-22
+- Mobile/reduced-motion QA sweep: enlarged tap targets (filters, chips, action buttons), added focus-visible outlines, kept reduced-motion guard. Cron trigger left as 4-hour schedule; verify in Cloudflare dashboard.

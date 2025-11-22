@@ -6,10 +6,14 @@ import tailwind from '@astrojs/tailwind';
 
 // https://astro.build/config
 export default defineConfig({
-  site: process.env.SITE_URL ?? 'https://lirikrohani.example',
+  site: process.env.SITE_URL ?? 'https://lirikrohani.com',
   adapter: cloudflare({
     platformProxy: {
       enabled: true,
+      // Persist local D1/KV state so dev env matches prod bindings structure.
+      persist: {
+        path: './.wrangler/state/v3',
+      },
     },
     imageService: 'cloudflare',
   }),

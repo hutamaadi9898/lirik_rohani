@@ -1,6 +1,6 @@
-Goal: Ship a fast, mobile-first Astro 5.16 app for searching Indonesian worship song lyrics (title or inline text) with minimal admin, strong SEO, and Cloudflare Workers + D1 + KV + Drizzle + FTS5. Checkboxes must be updated as work completes.
+Goal: Ship lirikrohani.com as a fast, minimalist Astro 5.16 app for Indonesian worship lyrics with great UX, strong SEO, and Cloudflare Workers + Pages + D1 + KV + Drizzle + FTS5. Keep tasks atomic and tick boxes as soon as they’re done.
 
-## Phase 0 — MVP (ship read-based search + basic pages)
+## Phase 0 — Foundation (mostly done)
 - Repo/tooling
   - [x] Write initial plan with phases
   - [x] Enable TypeScript strict mode + path aliases
@@ -31,21 +31,45 @@ Goal: Ship a fast, mobile-first Astro 5.16 app for searching Indonesian worship 
   - [x] wrangler bindings for D1 & KV (dev/prod)
   - [ ] Deploy MVP to Cloudflare (Pages/Workers) and verify search works
 
-## Phase 1 — Admin + reliability
+## Phase 1 — Reliability & admin polish
 - [x] Auth: single-user token or signed link middleware
 - [x] Admin UI: list/create/update songs, FTS rebuild button
 - [x] Audit log to KV (append-only) for admin actions
 - [x] Harden admin token flow (no query tokens, HttpOnly session, security headers)
-- [ ] Better error boundaries + user-facing fallbacks
-- [ ] P99 latency SLO (<75ms warm) measured and logged
+- [ ] Better error boundaries + user-facing fallbacks (keep `/api` and pages from blank states)
+- [x] P99 latency SLO (<75ms warm) measured and logged
+- [x] Add automated DB health check (migrations applied, bindings present) surfaced in `/api/health`
+- [x] Background KV cache warmer for top queries (schedule via Pages Function cron)
 
-## Phase 2 — Polish, observability, growth
-- [x] Refresh public UI (modern font, lucide icons, motion, faster-feel search)
-- [x] Minimalist polish (remove jargon, softer animations, cleaner lyrics page)
-- [x] SEO plan drafted for slug indexing & launch readiness
-- [x] Home mini-dashboard (counts + latest) and song page view counter
-- [ ] Feature flags via KV for staged rollouts
-- [ ] Analytics + structured logs
-- [ ] Accessibility pass (screen reader labels, contrast, reduced motion)
-- [ ] Core Web Vitals monitoring and Lighthouse budget
-- [ ] Content ops: slug rules, redirect map, 404/410 handling
+## Phase 2 — Launch on lirikrohani.com
+- [ ] Set `SITE_URL=https://lirikrohani.com` in env + `astro.config.mjs` and align canonical/OG links
+- [ ] Configure Cloudflare Pages project, point to repo, and enable `_routes.json`/`_headers` passthrough
+- [ ] Map custom domain: CNAME `www` → Pages target, apex A/AAAA flattening; force HTTPS
+- [ ] Add `www → apex` 301 and `http → https` redirects (Cloudflare Rules)
+- [ ] Provision/verify TLS for apex + www; enable HSTS (include subdomains, preload opt-in)
+- [ ] Update sitemap/robots to emit `https://lirikrohani.com` URLs and redeploy
+- [ ] Search Console + Bing Webmaster: verify domain property via TXT, submit sitemap
+- [ ] Production smoke: `/api/health`, search query, lyric detail render, admin login, cache hit log
+
+## Phase 3 — Experience & UI/UX (modern, minimalist, fast)
+- [ ] Apply cohesive minimalist theme (two-tone palette, soft glass effect, fluid spacing scale) and document tokens in Tailwind config
+- [ ] Add search microcopy in Bahasa + success/failure toasts for admin actions
+- [x] View Transitions for search → song detail and back, with reduced-motion guard
+- [x] Instant suggestions: suggest top queries/artists as chips (from KV stats) + keyboard focus order
+- [x] Filters: quick toggles for bahasa/artist + “only title matches” toggle; remember last filter in localStorage
+- [x] Result cards: highlight matched terms, show short lyric snippet with ellipsis + copy button
+- [x] Song page: floating action bar (copy lyric, share link, report issue) and scrollspy for sections (verses/chorus)
+- [x] Add offline-friendly “Save song” (localStorage) to re-open recently viewed lyrics
+- [ ] Accessibility pass: labels, focus rings, skip-to-search link, prefers-reduced-motion variants (partial)
+- [ ] QA sweep: mobile breakpoints, tap targets ≥48px, input focus, low-bandwidth mode (no motion, fewer images)
+
+## Phase 4 — Performance, SEO, and growth
+- [ ] Dynamic OG image generation per song (Satori/ResVG in Worker) with title/artist branding
+- [ ] Image/OG hygiene: 1200x630 WebP fallback logo + per-song cover if available
+- [ ] Security headers: CSP (script/style/img/frame), Referrer-Policy strict-origin-when-cross-origin, X-Content-Type-Options, Permissions-Policy
+- [ ] Core Web Vitals budget: LCP <1.8s, CLS <0.1, TBT <150ms on 4G; add `web-vitals` client logger to KV/Analytics
+- [ ] Analytics + structured logs (Cloudflare Analytics or PostHog) capturing search queries (anonymized) and result clicks
+- [ ] Feature flags via KV for staged rollouts (search chips, OG images, offline save)
+- [ ] Content ops: slug rules, redirect map, 404/410 handling, and CSV/JSON import validator before writes
+- [ ] Internationalization readiness: hreflang scaffolding if English added; split sitemaps by locale
+- [ ] Monitoring: uptime ping, wrangler tail dashboards, alert on 5xx/search error rate >1%

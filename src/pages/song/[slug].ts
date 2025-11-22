@@ -26,20 +26,29 @@ export const GET: APIRoute = async ({ params, locals, request }) => {
   const env = (locals.runtime?.env ?? {}) as Env;
 
   if (!env.LYRICS_DB) {
-    return new Response('Database binding missing', { status: 500, headers: { 'Content-Type': 'text/plain' } });
+    const location = new URL('/404', request.url).toString();
+    return Response.redirect(location, 302);
   }
 
-  const row = await env.LYRICS_DB.prepare(
-    `SELECT id, slug, title, artist, language, body, created_at, updated_at
-     FROM songs
-     WHERE slug = ?
-     LIMIT 1;`,
-  )
-    .bind(slug)
-    .first();
+  let row;
+  try {
+    row = await env.LYRICS_DB.prepare(
+      `SELECT id, slug, title, artist, language, body, created_at, updated_at
+       FROM songs
+       WHERE slug = ?
+       LIMIT 1;`,
+    )
+      .bind(slug)
+      .first();
+  } catch (err) {
+    console.error('Song query failed', err);
+    const location = new URL('/404', request.url).toString();
+    return Response.redirect(location, 302);
+  }
 
   if (!row) {
-    return Response.redirect('/404', 302);
+    const location = new URL('/404', request.url).toString();
+    return Response.redirect(location, 302);
   }
 
   const titleText = typeof row.title === 'string' ? row.title : String(row.title ?? '');
@@ -61,7 +70,7 @@ export const GET: APIRoute = async ({ params, locals, request }) => {
   }
   const requestUrl = new URL(request.url);
   const canonicalUrl = `${requestUrl.origin}/song/${slug}`;
-  const updatedHuman = new Date((row.updated_at ?? row.created_at ?? 0) * 1000).toLocaleDateString('id-ID', {
+  const updatedHuman = new Date(Number(row.updated_at ?? row.created_at ?? 0) * 1000).toLocaleDateString('id-ID', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -74,8 +83,8 @@ export const GET: APIRoute = async ({ params, locals, request }) => {
     inLanguage: languageText,
     byArtist: artistText ? { '@type': 'MusicGroup', name: artistText } : undefined,
     url: canonicalUrl,
-    datePublished: new Date((row.created_at ?? 0) * 1000).toISOString(),
-    dateModified: new Date((row.updated_at ?? row.created_at ?? 0) * 1000).toISOString(),
+    datePublished: new Date(Number(row.created_at ?? 0) * 1000).toISOString(),
+    dateModified: new Date(Number(row.updated_at ?? row.created_at ?? 0) * 1000).toISOString(),
   };
 
   const breadcrumbLd = {
@@ -179,6 +188,25 @@ export const GET: APIRoute = async ({ params, locals, request }) => {
       color: #e2e8f0;
     }
     .subtle { color: #94a3b8; font-size: 14px; margin-top: 6px; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 10px 0 4px;
+    }
+    .action {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      color: #e2e8f0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      min-height: 44px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+    }
+    .action:hover { transform: translateY(-1px); border-color: rgba(103,232,249,0.6); background: rgba(103,232,249,0.08); }
+    .action[data-saved="true"] { border-color: rgba(103,232,249,0.8); color: #a5f3fc; }
     @media (max-width: 640px) {
       main { padding: 26px 14px 56px; }
       article { padding: 18px 16px; }
@@ -201,11 +229,102 @@ export const GET: APIRoute = async ({ params, locals, request }) => {
       <p class="subtle">Diperbarui ${updatedHuman}</p>
     </header>
 
+    <div class="actions" role="group" aria-label="Tindakan cepat">
+      <button id="copy-lyric" class="action">Salin lirik</button>
+      <button id="share-link" class="action">Bagikan</button>
+      <button id="save-song" class="action" data-saved="false">Simpan lagu</button>
+    </div>
+
     <article>
       <p class="subtle">Dilihat ${Math.round(views).toLocaleString('id-ID')} kali</p>
       <pre>${formattedBody || 'Lirik belum tersedia.'}</pre>
     </article>
   </main>
+
+  <script>
+    (() => {
+      const lyric = ${JSON.stringify(formattedBody)};
+      const title = ${JSON.stringify(titleText)};
+      const artist = ${JSON.stringify(artistText || '')};
+      const slug = ${JSON.stringify(slug)};
+
+      const savedKey = 'lr_saved_songs';
+      const saveBtn = document.getElementById('save-song');
+
+      const loadSaved = () => {
+        try {
+          return JSON.parse(localStorage.getItem(savedKey) || '[]');
+        } catch { return []; }
+      };
+
+      const syncSavedState = () => {
+        const saved = loadSaved();
+        const exists = saved.some((s) => s.slug === slug);
+        if (saveBtn) {
+          saveBtn.dataset.saved = exists ? 'true' : 'false';
+          saveBtn.textContent = exists ? 'Tersimpan' : 'Simpan lagu';
+        }
+      };
+
+      const persistSaved = (next) => {
+        try { localStorage.setItem(savedKey, JSON.stringify(next.slice(0, 50))); } catch (e) { console.error(e); }
+      };
+
+      syncSavedState();
+
+      document.getElementById('copy-lyric')?.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(lyric);
+          toast('Lirik disalin.');
+        } catch (err) { toast('Gagal menyalin.'); }
+      });
+
+      document.getElementById('share-link')?.addEventListener('click', async () => {
+        const url = window.location.href;
+        const shareText = artist ? title + ' — ' + artist : title;
+        try {
+          if (navigator.share) {
+            await navigator.share({ title, text: shareText, url });
+          } else {
+            await navigator.clipboard.writeText(url);
+            toast('Tautan disalin.');
+          }
+        } catch (err) { toast('Gagal membagikan.'); }
+      });
+
+      saveBtn?.addEventListener('click', () => {
+        const saved = loadSaved();
+        const exists = saved.some((s) => s.slug === slug);
+        let next = saved;
+        if (exists) {
+          next = saved.filter((s) => s.slug !== slug);
+          toast('Dihapus dari tersimpan.');
+        } else {
+          next = [{ slug, title, artist }, ...saved].slice(0, 50);
+          toast('Lagu disimpan.');
+        }
+        persistSaved(next);
+        syncSavedState();
+      });
+
+      function toast(message) {
+        const el = document.createElement('div');
+        el.textContent = message;
+        el.style.position = 'fixed';
+        el.style.bottom = '22px';
+        el.style.right = '22px';
+        el.style.padding = '10px 14px';
+        el.style.borderRadius = '10px';
+        el.style.background = 'rgba(15,23,42,0.9)';
+        el.style.color = '#e2e8f0';
+        el.style.border = '1px solid rgba(255,255,255,0.15)';
+        el.style.boxShadow = '0 20px 60px rgba(0,0,0,0.35)';
+        el.style.zIndex = '999';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1800);
+      }
+    })();
+  </script>
 </body>
 </html>`;
 

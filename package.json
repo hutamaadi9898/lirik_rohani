@@ -14,9 +14,11 @@
 		"format": "biome format .",
 		"db:prepare": "drizzle-kit generate:sqlite",
 		"db:migrate": "wrangler d1 migrations apply LYRICS_DB",
-		"db:seed": "tsx scripts/seed.ts"
+		"db:seed": "tsx scripts/seed.ts",
+		"db:seed:txt": "tsx scripts/seed-from-txt.ts"
 	},
 	"dependencies": {
+		"@astrojs/check": "^0.9.5",
 		"@astrojs/cloudflare": "^12.6.11",
 		"@astrojs/react": "^4.4.2",
 		"@astrojs/tailwind": "^6.0.2",
@@ -27,7 +29,8 @@
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"tailwindcss": "^3.4.18",
-		"tailwindcss-animate": "^1.0.7"
+		"tailwindcss-animate": "^1.0.7",
+		"typescript": "^5.9.3"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.7",

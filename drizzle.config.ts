@@ -4,9 +4,8 @@ export default defineConfig({
   schema: './src/lib/db/schema.ts',
   out: './drizzle/migrations',
   dialect: 'sqlite',
-  driver: 'd1',
+  driver: 'd1-http',
   dbCredentials: {
-    wranglerConfigPath: './wrangler.jsonc',
-    databaseName: 'LYRICS_DB',
+    url: 'http://127.0.0.1:8787',
   },
 });

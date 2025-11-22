@@ -6,3 +6,10 @@ interface Env {
   AUDIT_LOG: KVNamespace;
   ADMIN_TOKEN: string;
 }
+
+declare namespace App {
+  interface Locals {
+    runtime?: { env: Partial<Env> & Record<string, unknown> };
+    isAdmin?: boolean;
+  }
+}

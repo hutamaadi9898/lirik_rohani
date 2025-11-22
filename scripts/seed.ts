@@ -45,7 +45,7 @@ ${values}
 }
 
 function escape(str: string) {
-  return str.replace(/'/g, "''").replace(/\n/g, '\\n');
+  return str.replace(/'/g, "''");
 }
 
 main();
