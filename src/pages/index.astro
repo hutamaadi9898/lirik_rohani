@@ -11,31 +11,42 @@ import StatsIsland from '../components/StatsIsland';
       <div class="pointer-events-none absolute -right-24 bottom-[-180px] h-[520px] w-[520px] rounded-full bg-sky-500/10 blur-3xl" aria-hidden="true" />
       <div class="grid items-center gap-10 lg:grid-cols-[1.05fr,0.95fr]">
         <div class="space-y-6">
-          <p class="inline-flex items-center gap-2 rounded-full border border-cyan-200/20 bg-cyan-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-cyan-100 shadow-sm">Temukan lagu rohani</p>
+          <p class="inline-flex items-center gap-2 rounded-full border border-cyan-200/20 bg-cyan-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-cyan-100 shadow-sm">Lagu untuk jemaat</p>
           <div class="space-y-4">
             <h1 class="text-4xl font-semibold leading-tight text-white sm:text-5xl">
-              Ketik judul atau potongan lirik. Hasil muncul seketika.
+              Cari lirik pujian & penyembahan berbahasa Indonesia.
             </h1>
             <p class="max-w-3xl text-base text-slate-200 sm:text-lg">
-              Cocok untuk ibadah, latihan, atau mengingat lirik favorit. Tanpa istilah teknis, hanya cari dan temukan.
-              Dibangun di Cloudflare Workers + D1 + FTS5 yang ringan, jadi pencarian tetap cepat bahkan di koneksi lambat.
+              Untuk WL, singer, pemain musik, dan jemaat yang mau menyiapkan ibadah. Tinggal ketik judul atau potongan lirik, kami tampilkan lirik lengkap seketika.
+              Koleksi kurasi gereja-gereja Indonesia, tanpa iklan dan aman dibuka di proyektor gereja.
             </p>
           </div>
           <div class="flex flex-wrap gap-3 text-sm text-slate-200">
-            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">🔥 900+ lagu terkurasi</span>
-            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">FTS5 full-body search</span>
-            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">Bebas iklan & pelacak</span>
+            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">🔥 900+ lagu rohani</span>
+            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">Bahasa Indonesia & Inggris</span>
+            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">FTS5 super cepat</span>
+            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">Tanpa iklan</span>
           </div>
         </div>
 
         <div class="relative">
           <div class="aspect-[4/3] overflow-hidden rounded-2xl border border-white/10 bg-slate-900/60 shadow-2xl backdrop-blur">
-            <img src="/hero-chorus.svg" alt="Ilustrasi choir dan lagu rohani" loading="lazy" decoding="async" class="h-full w-full object-cover" />
+            <picture>
+              <source srcset="https://images.pexels.com/photos/1112048/pexels-photo-1112048.jpeg?auto=compress&cs=tinysrgb&w=1280&dpr=2" media="(min-width: 900px)" />
+              <img
+                src="https://images.pexels.com/photos/1112048/pexels-photo-1112048.jpeg?auto=compress&cs=tinysrgb&w=900&h=600&dpr=1"
+                alt="Jemaat beribadah dengan tangan terangkat"
+                loading="lazy"
+                decoding="async"
+                class="h-full w-full object-cover"
+              />
+            </picture>
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/10 to-transparent" aria-hidden="true"></div>
           </div>
-          <div class="absolute -left-6 -bottom-6 hidden min-w-[210px] rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 shadow-xl backdrop-blur sm:block">
-            <p class="text-xs uppercase tracking-[0.18em] text-cyan-200">Cepat & ringan</p>
-            <p class="mt-1 text-lg font-semibold">Pencarian <span class="text-cyan-200">&lt; 150ms</span></p>
-            <p class="text-xs text-slate-400">Cache + indeks FTS5 yang dipanaskan otomatis.</p>
+          <div class="absolute -left-6 -bottom-6 hidden min-w-[220px] rounded-2xl border border-white/10 bg-slate-950/85 px-4 py-3 text-sm text-slate-100 shadow-xl backdrop-blur sm:block">
+            <p class="text-xs uppercase tracking-[0.18em] text-cyan-200">Siap untuk ibadah</p>
+            <p class="mt-1 text-lg font-semibold">Cari, tampilkan, nyanyikan</p>
+            <p class="text-xs text-slate-400">Optimasi proyektor & layar ponsel. Lirik rapi, mudah dibaca.</p>
           </div>
         </div>
       </div>
