@@ -93,3 +93,5 @@
 - Swapped hero image to cached public path to avoid 404s; redesigned logo + favicon gradient monogram; build ✅.
 2025-11-22
 - Simplified logo to modern line monogram and replaced hero with lighter 76KB WebP to trim LCP bytes; build ✅.
+2025-11-22
+- Added WebSite/SearchAction JSON-LD on homepage + wrote `tutorial-seo.md` SEO playbook; build ✅.

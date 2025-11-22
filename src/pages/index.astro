@@ -7,6 +7,19 @@ import logo from '../assets/logo.svg';
 import { Image } from 'astro:assets';
 ---
 <BaseLayout title="Lirik Lagu Rohani" description="Cari lirik lagu rohani Indonesia dengan FTS5 super cepat di Cloudflare.">
+  <script type="application/ld+json">
+    {JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'Lirik Rohani',
+      url: 'https://lirikrohani.com',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: 'https://lirikrohani.com/?q={search_term_string}',
+        'query-input': 'required name=search_term_string',
+      },
+    })}
+  </script>
   <section class="space-y-10">
     <div class="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 px-6 py-10 shadow-2xl sm:px-10 sm:py-12">
       <div class="pointer-events-none absolute -left-32 top-[-120px] h-96 w-96 rounded-full bg-cyan-400/10 blur-3xl" aria-hidden="true" />
