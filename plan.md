@@ -39,7 +39,7 @@ Goal: Ship lirikrohani.com as a fast, minimalist Astro 5.16 app for Indonesian w
 - [ ] Better error boundaries + user-facing fallbacks (keep `/api` and pages from blank states)
 - [x] P99 latency SLO (<75ms warm) measured and logged
 - [x] Add automated DB health check (migrations applied, bindings present) surfaced in `/api/health`
-- [x] Background KV cache warmer for top queries (schedule via Pages Function cron)
+- [x] Background KV cache warmer endpoint; cron scheduling unsupported on Pages (manual trigger only)
 
 ## Phase 2 — Launch on lirikrohani.com
 - [ ] Set `SITE_URL=https://lirikrohani.com` in env + `astro.config.mjs` and align canonical/OG links

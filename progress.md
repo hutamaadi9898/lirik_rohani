@@ -57,3 +57,7 @@
 - Added view transitions + skip link, card title highlighting, reduced-motion guard; created SafeIsland error boundary; wired cron trigger and scheduled warm-cache handler; fixed driver config and typings.
 2025-11-22
 - Mobile/reduced-motion QA sweep: enlarged tap targets (filters, chips, action buttons), added focus-visible outlines, kept reduced-motion guard. Cron trigger left as 4-hour schedule; verify in Cloudflare dashboard.
+2025-11-22
+- Removed unsupported `triggers` block from wrangler.jsonc to fix Pages deploy; cron must be configured via Cloudflare dashboard instead.
+2025-11-22
+- Removed `onSchedule` cron handler from `/api/warm-cache` (Pages doesn't support cron); warmer now manual-only and plan updated accordingly.

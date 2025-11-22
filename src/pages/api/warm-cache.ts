@@ -51,11 +51,6 @@ export const GET: APIRoute = async ({ locals, request }) => {
   return json({ ok: true, warmed });
 };
 
-export const onSchedule = async (context: any) => {
-  if (!context.env?.LYRICS_DB) return;
-  await warm(context.env as Env, DEFAULT_QUERIES);
-};
-
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,

@@ -34,11 +34,6 @@
 	],
 	"observability": {
 		"enabled": true
-	},
-	"triggers": {
-		"crons": [
-			"0 */4 * * *"
-		]
 	}
 	/**
 	 * Smart Placement
