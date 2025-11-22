@@ -95,3 +95,5 @@
 - Simplified logo to modern line monogram and replaced hero with lighter 76KB WebP to trim LCP bytes; build ✅.
 2025-11-22
 - Added WebSite/SearchAction JSON-LD on homepage + wrote `tutorial-seo.md` SEO playbook; build ✅.
+2025-11-22
+- Sitemap now falls back to SITE_URL (lirikrohani.com) instead of example.com when no request origin; build ✅.

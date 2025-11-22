@@ -4,9 +4,10 @@ type Env = { LYRICS_DB?: D1Database };
 
 export async function GET({ locals }: { locals: any }) {
   const env = locals.runtime?.env as Env | undefined;
+  const site = (process.env.SITE_URL ?? 'https://lirikrohani.com').replace(/\/$/, '');
   const origin = locals.runtime?.request?.url
     ? new URL(locals.runtime.request.url).origin
-    : 'https://example.com';
+    : site;
 
   let rows:
     | { slug: string; updated_at: number | null }[]
