@@ -13,7 +13,7 @@ import logo from '../assets/logo.svg';
       <div class="grid items-center gap-10 lg:grid-cols-[1.05fr,0.95fr]">
         <div class="space-y-6">
           <div class="flex items-center gap-3 text-cyan-100">
-            <img src={logo} alt="Lirik Rohani" class="h-9 w-9 rounded-xl border border-white/10 bg-white/5 p-1" loading="lazy" decoding="async" />
+            <img src={logo.src} alt="Lirik Rohani" width={logo.width} height={logo.height} class="h-9 w-9 rounded-xl border border-white/10 bg-white/5 p-1" loading="lazy" decoding="async" />
             <p class="inline-flex items-center gap-2 rounded-full border border-cyan-200/20 bg-cyan-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-cyan-100 shadow-sm">Lagu untuk jemaat</p>
           </div>
           <div class="space-y-4">
@@ -29,8 +29,10 @@ import logo from '../assets/logo.svg';
         <div class="relative">
           <div class="aspect-[4/3] overflow-hidden rounded-2xl border border-white/10 bg-slate-900/60 shadow-2xl backdrop-blur">
             <img
-              src={bibleImg}
+              src={bibleImg.src}
               alt="Alkitab terbuka untuk persiapan ibadah"
+              width={bibleImg.width}
+              height={bibleImg.height}
               loading="lazy"
               decoding="async"
               class="h-full w-full object-cover"

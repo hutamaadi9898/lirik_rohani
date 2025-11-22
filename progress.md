@@ -83,3 +83,5 @@
 - Reworked homepage copy for jemaat Indonesia + added real Pexels hero photo for worship context; build ✅.
 2025-11-22
 - Updated homepage: local bible hero image + logo, simplified copy, title now “Lirik Lagu Rohani”; build ✅.
+2025-11-22
+- Fixed hero/logo rendering (use Astro asset src/width/height); rebuild ready for deploy.
