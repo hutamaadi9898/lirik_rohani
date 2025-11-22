@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "include": [
+    "/_server-islands/*",
+    "/_image",
+    "/api/*",
+    "/sitemap.xml",
+    "/song/*",
+    "/*"
+  ],
+  "exclude": [
+    "/_astro/*",
+    "/favicon.svg",
+    "/robots.txt",
+    "/.assetsignore"
+  ]
+}

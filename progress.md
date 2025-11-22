@@ -73,3 +73,5 @@
 - Switched islands to `client:load` (from client:only) to force hydration at page load; ensures stats/search React effects fire on Pages even with aggressive caching.
 2025-11-22
 - Removed SafeIsland wrapper and added inline error boundaries; Stats/Search islands now hydrate directly and fetch on load without relying on nested child hydration.
+2025-11-22
+- Added custom `public/_routes.json` to route all unknown paths through the worker (with static exclusions), restoring custom 404 handling on Pages for URLs like `/a`.
